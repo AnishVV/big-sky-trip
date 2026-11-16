@@ -11,8 +11,25 @@ const store = {
 
 /* ===== scale to window ===== */
 const stage = $('#stage');
-function fit(){ stage.style.zoom = window.innerWidth / 1672; }
-addEventListener('resize', fit); fit();
+const mq = matchMedia('(max-width:900px)');          /* same breakpoint as the @media block in styles.css */
+const isMobile = () => mq.matches;
+function fit(){
+  document.body.classList.toggle('mobile', isMobile());
+  stage.style.zoom = isMobile() ? '' : window.innerWidth / 1672;
+}
+let wasMobile = isMobile();
+function onViewport(){ fit(); if (isMobile() !== wasMobile){ wasMobile = isMobile(); render(); } }   /* crossing the breakpoint re-renders so maps and task text rebuild */
+addEventListener('resize', onViewport); mq.addEventListener('change', onViewport); fit();
+
+/* mobile menu */
+const menuBtn = $('#moreBtn'), sidebar = $('#sidebar');
+function setMenu(open){
+  sidebar.classList.toggle('open', open); $('#scrim').classList.toggle('open', open);
+  menuBtn.setAttribute('aria-expanded', open); document.body.classList.toggle('menu-open', open);
+}
+menuBtn.onclick = () => setMenu(!sidebar.classList.contains('open'));
+$('#scrim').onclick = () => setMenu(false);
+addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 
 /* ===== state ===== */
 const doneSet = new Set(store.get('done', TASKS.filter(t=>t.done).map(t=>t.id)));
@@ -38,7 +55,7 @@ function banner(title, sub){
     <div class="pb-text"><div class="pb-kicker">— EXPERTS ONLY · BIG SKY —</div><h1>${title}</h1><p>${sub}</p></div></header>`;
 }
 const card = (title, inner, cls='') => `<section class="card panel ${cls}">${title?`<h3>${title}</h3>`:''}${inner}</section>`;
-const table = (head, rows) => `<table class="tbl"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const table = (head, rows, stack=false) => `<div class="tbl-wrap"><table class="tbl${stack?' stack':''}"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td data-label="${esc(head[i]||'')}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 const dl = rows => `<dl class="facts">${rows.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
 
 /* ===== HOME ===== */
@@ -62,7 +79,7 @@ function viewHome(){
     <img class="hero-img" src="img/hero.jpg" alt=""><div class="hero-shade"></div>
     <div class="hero-copy">
       <div class="hero-kicker"><span>—</span> BIG SKY <span>—</span></div>
-      <div class="hero-tag">EAT SKI RAVE REPEAT</div>
+      <div class="hero-tag"><span>EAT SKI</span> <span>RAVE REPEAT</span></div>
       <div class="hero-date"><i></i>MARCH 13–14, 2027<b>•</b>BIG SKY, MONTANA<i></i></div>
     </div>
   </section>
@@ -102,13 +119,14 @@ function viewHome(){
     <div class="card tasks">
       <div class="card-head">${ico('check','ico-check')}<h2>YOUR TASKS</h2><span class="muted">${n} / ${total} complete</span></div>
       <div class="bar"><i style="width:${n/total*100}%"></i></div>
-      <ul class="tasklist" id="homeTasks">${taskPreview().map(t=>`<li data-id="${t.id}" class="${doneSet.has(t.id)?'done':''}"><span class="cb"></span>${esc(t.t.length>30? t.t.slice(0,29)+'…':t.t)}</li>`).join('')}</ul>
+      <ul class="tasklist" id="homeTasks">${taskPreview().map(t=>`<li data-id="${t.id}" class="${doneSet.has(t.id)?'done':''}"><span class="cb"></span>${esc(!isMobile() && t.t.length>30? t.t.slice(0,29)+'…':t.t)}</li>`).join('')}</ul>
       <a class="link-sm" href="#/tasks">View All Tasks ${ico('arrow')}</a>
     </div>
     <div class="card weather" title="Typical March climate for Big Sky; no forecast exists this far out">
       <div class="card-head"><svg class="ico-sun"><use href="#i-snow"/></svg><h2>TRIP WEATHER</h2></div>
       <div class="w-main"><span class="w-temp">~28°F</span><span class="w-cond">avg</span></div>
       <div class="w-side"><div>H: ~40°&nbsp;&nbsp;&nbsp;L: ~15°</div><div>No forecast yet</div></div>
+      <div class="w-note">Typical March climate for Big Sky; a real forecast does not exist this far out.</div>
       <div class="w-days">
         <div><span>Sat</span><svg><use href="#i-snow"/></svg><b>~40° / 15°</b></div>
         <div><span>Sun</span><svg><use href="#i-snow"/></svg><b>~40° / 15°</b></div>
@@ -152,12 +170,21 @@ function bindHome(){
 function viewItinerary(){
   return banner('Itinerary','Fri Mar 12 – Tue Mar 16, 2027 · Big Sky, Montana') + `<div class="page">
     <div class="note warn">Gate and set times are not published. The 5–11 pm window is from the Town Center listing. Lineup beyond John Summit is TBA (past editions announced 1–7 weeks out).</div>
-    <div class="itin-grid">${ITINERARY.map(d => { const [wd,mo,dn] = d.date.split(' ');
+    <div class="daynav">${ITINERARY.map((d,i) => { const [wd,,dn] = d.date.split(' '); return `<button type="button" data-day="${i}" class="${d.items.some(x=>/Show/.test(x.t))?'show':''}">${wd} ${dn}</button>`; }).join('')}</div>
+    <div class="itin-grid">${ITINERARY.map((d,di) => { const [wd,mo,dn] = d.date.split(' ');
       const show = d.items.some(i => /Show/.test(i.t));
-      return `<section class="card day ${show?'show':''}">
+      return `<section class="card day ${show?'show':''}" id="day-${di}">
       <div class="day-side"><div class="day-wd">${wd}</div><div class="day-n">${dn}</div><div class="day-mo">${mo}</div>${show?'<div class="day-badge">Festival</div>':''}</div>
       <ol class="tl">${d.items.map(i => `<li><span class="tl-ico">${ico(i.icon)}</span><div class="tl-body"><div class="tl-title"><strong>${esc(i.t)}</strong> ${i.flag?flagTag(i.flagText):''}</div><div class="sub">${esc(i.sub)}</div>${i.note?`<p>${esc(i.note)}</p>`:''}</div></li>`).join('')}</ol></section>`; }).join('')}</div>
   </div>`;
+}
+
+function bindItinerary(){
+  const chips = [...document.querySelectorAll('.daynav button')];
+  chips.forEach(b => b.onclick = () => document.getElementById('day-'+b.dataset.day).scrollIntoView({behavior:'smooth', block:'start'}));
+  if (!chips.length || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) chips.forEach(c => c.classList.toggle('on', c.dataset.day === e.target.id.slice(4))); }), {rootMargin:'-140px 0px -60% 0px'});
+  document.querySelectorAll('.itin-grid .day').forEach(d => io.observe(d));
 }
 
 /* ===== EXPLORE ===== */
@@ -175,6 +202,7 @@ function viewExplore(cat='all'){
       <div class="plinks">${link('Open in Google Maps', gmapsSearch(e))} ${e.ll?link('Directions', gmapsDir(e)):''}</div></div>`).join('');
   return banner('Explore Big Sky','Resort, festival, food and lodging in one place') + `<div class="page">
     <div class="chips">${chips}</div>
+    <div class="maphint">Tap a place to jump to it on the map. Pinch or use +/− to zoom.</div>
     <div class="mapwrap">
       <div class="mapbox card"><div id="map"></div></div>
       <div class="placelist">${items}</div>
@@ -187,7 +215,7 @@ function bindExplore(){
   const [, , arg='all'] = location.hash.split('/');
   const cat = CATS[arg] ? arg : 'all';
   const pins = EXPLORE.filter(e => e.ll && (cat==='all' || e.cat===cat));
-  const map = exploreMap = L.map('map', {zoomControl:true, scrollWheelZoom:false});
+  const map = exploreMap = L.map('map', {zoomControl:true, scrollWheelZoom:false, dragging:!isMobile()});   /* phones: one finger scrolls the page past the pinned map; pinch + buttons still zoom */
   const dark = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, className:'tiles-dark', attribution:'&copy; OpenStreetMap contributors'});
   const street = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, className:'', attribution:'&copy; OpenStreetMap contributors'});
   const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {maxZoom:17, attribution:'&copy; OpenStreetMap contributors, SRTM | OpenTopoMap'});
@@ -240,7 +268,7 @@ function viewBookings(){
   return banner('Bookings','What is locked in and what is still open') + `<div class="page">
     ${card('', table(['Item','Status','Details','Cost'], BOOKINGS.map(b => [
       `<b>${b.item}</b>`, `<span class="tag ${cls[b.status]}">${b.status}</span>`,
-      esc(b.detail) + (b.href?` ${link('Listing', b.href)}`:'') + (b.flag?` ${flagTag(b.flag)}`:''), b.cost])))}
+      esc(b.detail) + (b.href?` ${link('Listing', b.href)}`:'') + (b.flag?` ${flagTag(b.flag)}`:''), b.cost]), true))}
   </div>`;
 }
 
@@ -323,13 +351,15 @@ function viewActivities(cat='all'){
     <div class="plinks">${a.links.map(l=>link(l[0],l[1])).join(' ')} ${link('Google Maps','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a.name+' '+a.where))}</div></section>`).join('');
   return banner('Things to Do','Non-skiing options for the group · Mar 12–16, 2027') + `<div class="page">
     <div class="note warn">Prices are undated estimates from listings and resellers, <b>not confirmed for March 2027</b>. Many are per sleigh, sled or boat, so 14 people means several. Call or check the link before booking. Full notes live in the vault under Non Skiing.</div>
-    <div class="chips" style="flex-wrap:wrap">${chips}</div>
+    <div class="chips wrap">${chips}</div>
     <div class="grid2">${cards}</div>
   </div>`;
 }
 
 /* ===== router ===== */
-const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
+const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary,bindItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
+let lastHash = null;
+const PAGE_TITLE = {home:'Experts Only', festival:'Experts Only'};
 function render(){
   const [, route='home', arg] = location.hash.split('/');
   const [fn, bind] = ROUTES[route] || ROUTES.home;
@@ -338,7 +368,14 @@ function render(){
   $('.main').classList.toggle('is-home', route==='home' || !ROUTES[route]);
   document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.route === (route==='festival'?'home':route)));
   $('#bellDot').textContent = pending();
-  window.scrollTo(0,0);
+  const tab = ROUTES[route] ? (route==='festival' ? 'home' : route) : 'home';
+  document.querySelectorAll('#tabbar a').forEach(a => a.classList.toggle('active', a.dataset.tab === tab));
+  menuBtn.classList.toggle('active', !document.querySelector(`#tabbar a[data-tab="${tab}"]`));
+  const navLink = document.querySelector(`#nav a[data-route="${route}"]`);
+  $('#tbTitle').textContent = PAGE_TITLE[route] || (navLink ? navLink.textContent.trim() : 'Experts Only');
+  setMenu(false);
+  if (location.hash !== lastHash) window.scrollTo(0,0);   /* task / crew edits re-render in place without jumping */
+  lastHash = location.hash;
 }
 addEventListener('hashchange', render);
 render();

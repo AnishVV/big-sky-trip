@@ -286,3 +286,202 @@ a.pill:hover,.chip:hover{background:#26262a}
 .explore .legend .pill{position:static}
 .explore .legend .pill i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .explore .card-head,.explore .mapbtn{z-index:600}
+
+/* ======================================================================
+   Mobile / small-screen layout.  Desktop above 900px is the scaled canvas
+   defined earlier in this file; app.js switches the zoom off at the same
+   breakpoint (matchMedia) so the two never disagree.
+   ====================================================================== */
+.topbar,.scrim,.tabbar,.daynav{display:none}
+.hero-tag span{display:inline-block}
+.w-note{display:none}
+.chips.wrap{flex-wrap:wrap}
+.tbl-wrap{display:block}
+.maphint{display:none}
+
+@media (max-width:900px){
+:root{--tb:56px;--top:calc(var(--tb) + env(safe-area-inset-top));--tabh:58px;--bot:calc(var(--tabh) + env(safe-area-inset-bottom))}
+html{-webkit-text-size-adjust:100%}
+html,body{overflow-x:clip}   /* 'hidden' on both html and body makes body a scroll container, which breaks position:sticky */
+body{padding-top:var(--top);padding-bottom:var(--bot);overflow-wrap:break-word}
+body.menu-open{overflow:hidden}
+button,a{-webkit-tap-highlight-color:transparent}
+
+/* shell */
+.stage{width:100%;min-height:calc(100dvh - var(--top) - var(--bot));display:block}
+.main{width:100%;min-height:0}
+.card{isolation:isolate}
+
+/* top bar + drawer */
+.topbar{display:flex;position:fixed;top:0;left:0;right:0;z-index:2000;height:var(--top);padding:env(safe-area-inset-top) 64px 0 max(16px,env(safe-area-inset-left));align-items:center;justify-content:space-between;background:rgba(11,11,12,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #1d1d1f}
+.tb-brand{display:flex;align-items:center;gap:12px;min-height:44px;color:#ece7e1}
+.tb-brand svg{width:40px;height:32px}
+.tb-brand span{font-family:Oswald,Impact,sans-serif;font-weight:700;font-size:20px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.scrim{display:block;position:fixed;inset:0;z-index:1800;background:rgba(0,0,0,.6);opacity:0;visibility:hidden;transition:opacity .2s;touch-action:none}
+.scrim.open{opacity:1;visibility:visible}
+.tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:2000;height:var(--bot);padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:rgba(11,11,12,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid #232325}
+.tabbar a,.tabbar button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9a948d;font-size:11.5px;font-weight:500;letter-spacing:.2px}
+.tabbar svg{font-size:24px}
+.tabbar .active{color:#f1ece6}
+.tabbar a.active svg,.tabbar button.active svg{color:#8fb0ff}
+.tabbar a:active,.tabbar button:active{background:#18181a}
+/* "More" opens a bottom sheet with every page */
+.sidebar{position:fixed;top:auto;left:0;right:0;bottom:var(--bot);width:auto;height:auto;max-height:calc(100dvh - var(--top) - var(--bot) - 12px);overflow-y:auto;overscroll-behavior:contain;z-index:1900;border:1px solid #2b2b2d;border-bottom:0;border-radius:18px 18px 0 0;transform:translateY(24px);opacity:0;visibility:hidden;transition:transform .22s,opacity .2s,visibility .22s}
+.sidebar.open{transform:none;opacity:1;visibility:visible}
+.brand,.side-divider,.side-foot{display:none}
+.nav{margin:0;padding:16px max(14px,env(safe-area-inset-left)) 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nav a,.nav a.active{height:58px;margin:0;font-size:15px;line-height:19px;padding:0 12px;gap:12px;background:#151516;border:1px solid #2b2b2d;border-radius:12px}
+.nav a.active{background:#26262a;border-color:#4a4a4e}
+.nav a svg{font-size:24px;flex:none}
+.hero-top{position:fixed;top:calc(env(safe-area-inset-top) + 8px);right:max(12px,env(safe-area-inset-right));z-index:2100;gap:0}
+.avatars{display:none}
+.bell{width:42px;height:42px;font-size:22px}
+
+/* ---------- home ---------- */
+.hero{position:relative;width:100%;height:auto;min-height:340px;display:flex;padding:30px 16px 34px}
+.hero-img{object-position:center bottom}
+.hero-shade{background:linear-gradient(rgba(8,8,9,.55),rgba(8,8,9,.25) 50%,var(--bg))}
+.hero-copy{position:relative;left:auto;top:auto;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;z-index:1}
+.hero-kicker,.hero-tag,.hero-date{position:static}
+.hero-kicker{font-size:14px;letter-spacing:5px}
+.hero-tag{white-space:normal;font-size:clamp(42px,13.5vw,72px);line-height:1.05}
+.hero-date{flex-wrap:wrap;justify-content:center;font-size:12.5px;letter-spacing:2px;line-height:20px;white-space:normal}
+.hero-date i{display:none}
+.hero-date b{margin:0 10px}
+.home{padding:0 16px 40px}
+.stats{grid-template-columns:1fr 1fr;height:auto;gap:12px}
+.stat{padding:14px;gap:12px;min-height:84px}
+.countdown{grid-column:1/-1}
+.count span{font-size:42px}
+.spark{width:130px;height:40px}
+.stat.link{flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;min-height:104px}
+.stat-glyph,.stat-glyph.pin,.stat-glyph.music{font-size:32px;width:32px;height:32px;margin:0}
+.stat-val{font-size:16px;margin-top:2px}.stat-val.sm{font-size:16px}
+.stat-arrow{right:16px;top:50%;transform:translateY(-50%);margin:0;font-size:20px}
+.stat.link:last-child{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;min-height:76px}
+.eyebrow{font-size:12px}
+
+.row2,.row3{display:flex;flex-direction:column;height:auto;gap:12px;margin-top:12px}
+.upnext{padding:18px 16px 16px}
+.upnext .card-head,.upnext .timeline{position:relative;left:auto;top:auto}
+.timeline{margin-top:18px}
+.timeline li{height:auto;min-height:64px}
+.timeline li:not(:last-child)::after{top:38px;bottom:6px;height:auto}
+.timeline em,.timeline span{font-size:13px;line-height:18px}
+.timeline strong{font-size:16px}
+.upnext .btn{position:relative;left:auto;bottom:auto;margin-top:10px}
+.btn.outline{height:44px;padding:0 16px;font-size:14px}
+.explore{height:300px}
+.explore .card-head{left:16px;top:16px}
+.explore .card-head h2{font-size:15px}
+.mapbtn{right:12px;top:10px;height:38px;font-size:13px}
+.explore .legend{left:12px;right:12px;bottom:12px;gap:6px;flex-wrap:wrap}
+.explore .legend .pill{height:40px;font-size:13px;padding:0 12px 0 10px}
+
+.row3 .card{padding:16px;height:auto}
+.row3 .card:nth-child(3){margin-left:0}
+.tasklist li{height:auto;min-height:44px;white-space:normal;font-size:15px;gap:14px}
+.cb{width:22px;height:22px}
+.link-sm{position:static;margin-top:10px;justify-content:flex-end;min-height:44px;font-size:14.5px}
+.weather .card-head h2,.budget .card-head h2{margin:0}
+.ico-sun,.ico-wallet{position:static;margin:0;font-size:32px}
+.w-main{margin:12px 0 0;top:0}
+.w-side{position:static;margin-top:8px;padding:0;font-size:14px}
+.w-side::before{display:none}
+.w-note{display:block;margin-top:8px;font-size:12.5px;line-height:18px;color:#a8a29b}
+.w-days{position:static;margin-top:14px}
+.w-days div{font-size:13.5px}
+.b-total{margin:12px 0 0}.b-per{margin:2px 0 0;font-size:14px}
+.bar.thick,.budget .bar.thick{width:100%;margin-left:0}
+.b-paid{position:static;margin-top:6px;font-size:12.5px}
+.b-lines{position:static;width:auto;margin:14px 0 0;padding:12px 0 0;border-left:0;border-top:1px solid #2d2d2f;font-size:14.5px;line-height:26px}
+.budget .btn{position:static;margin-top:12px;width:100%;justify-content:center;height:44px}
+
+/* ---------- sub pages ---------- */
+.page-banner{height:150px}
+.page-banner img{object-position:center 60%}
+.pb-text{left:max(16px,env(safe-area-inset-left));right:16px;bottom:18px}
+.pb-kicker{font-size:11px;letter-spacing:3px}
+.day-badge{font-size:11px}
+.page-banner h1{font-size:36px;line-height:40px}
+.page-banner p{font-size:13.5px;line-height:19px}
+.page{padding:12px max(16px,env(safe-area-inset-right)) 40px max(16px,env(safe-area-inset-left));gap:14px}
+.panel{padding:16px}
+.panel h3{font-size:16.5px}
+.panel p,.panel ul,.note{font-size:14.5px;line-height:22px}
+.panel .sub,.sub{font-size:13px;line-height:19px}
+.grid2,.cols,.grid-tc,.mapwrap{grid-template-columns:1fr;gap:14px}
+.grid-tc>div{gap:14px}
+.facts div{grid-template-columns:100px 1fr;gap:10px;font-size:14px;line-height:20px}
+.tag{font-size:11.5px}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl{font-size:13.5px}
+.tbl th,.tbl td{padding:8px 6px}
+.tbl th{letter-spacing:.4px;font-size:11px}
+.tbl.stack{min-width:0}
+.tbl.stack thead{display:none}
+.tbl.stack,.tbl.stack tbody,.tbl.stack tr,.tbl.stack td{display:block;width:100%}
+.tbl.stack tr{padding:12px 0;border-bottom:1px solid #2d2d2f}
+.tbl.stack tr:last-child{border-bottom:0}
+.tbl.stack td{border:0;padding:3px 0;font-size:14px;line-height:20px}
+.tbl.stack td:first-child{font-size:16px}
+.tbl.stack td:nth-child(n+3)::before{content:attr(data-label);display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#a8a29b}
+
+/* itinerary */
+.daynav{display:flex;gap:6px;position:sticky;top:var(--top);z-index:40;margin:0 -16px;padding:8px 16px;background:rgba(11,11,12,.95);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid #1d1d1f}
+.daynav button{flex:1;min-width:0;height:40px;border:1px solid #3c3c3e;border-radius:10px;background:#141415;font-size:13.5px;font-weight:600;white-space:nowrap}
+.daynav button.show{border-color:#34508f;color:#b9ccff}
+.daynav button.on{background:#2a2a2b;border-color:#bdb8b1;color:#fff}
+.daynav button.show.on{background:#1b2a52;border-color:#5b84e8}
+.itin-grid .day{scroll-margin-top:calc(var(--top) + 64px)}
+.itin-grid{grid-template-columns:1fr;gap:12px}
+.itin-grid .day-side{padding:12px 16px}
+.itin-grid .day .tl{padding:16px}
+.itin-grid .tl li{padding-bottom:16px}
+.itin-grid .tl li:not(:last-child)::before{left:16px;top:36px}
+.itin-grid .tl-ico{width:32px;height:32px}.itin-grid .tl-ico svg{width:17px;height:17px;font-size:17px}
+.itin-grid .tl strong{font-size:15.5px;line-height:20px}
+.itin-grid .tl p{font-size:13.5px;line-height:19px}
+.itin-grid .tl .sub{font-size:13px;line-height:18px}
+.itin-grid .tag{font-size:11px}
+
+/* chips: one scrolling strip */
+.chips{flex-wrap:nowrap;overflow-x:auto;gap:8px;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;white-space:nowrap;min-height:40px;padding:0 16px;font-size:14px}
+
+/* explore */
+.mapwrap{display:flex;flex-direction:column;align-items:stretch}
+.mapwrap .mapbox{position:sticky;top:calc(var(--top) + 8px);z-index:30;flex:none;height:36vh;min-height:210px;max-height:320px;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.placelist{height:auto;overflow:visible;padding-right:0;gap:10px}
+.maphint{display:block;font-size:13px;line-height:18px;color:#a8a29b;margin-top:-4px}
+.place{padding:14px}
+.place h3{font-size:16px}
+.place p{font-size:14px;line-height:20px}
+.plinks{flex-wrap:wrap;gap:6px 18px;font-size:13.5px}
+.plinks .ext{min-height:36px}
+.cat{font-size:11.5px}
+.leaflet-touch .leaflet-bar a{width:40px;height:40px;line-height:40px}
+.fitall{padding:10px 14px;font-size:14px}
+
+/* tasks, crew, budget */
+.tasklist.big li{min-height:48px;padding:10px 0;font-size:15px}
+.tasklist.big .sub{font-weight:400}
+.crew button{width:44px;height:44px}
+.crew li{padding:6px 0}
+#crewForm{gap:10px}
+#crewForm input{height:44px;font-size:16px;padding:0 12px}
+.slider{gap:12px}
+.slider input{height:36px}
+.seg button{min-height:44px;padding:0 16px;font-size:14px}
+.big{font-size:31px}
+}
+
+/* narrow phones */
+@media (max-width:380px){
+.facts div{grid-template-columns:1fr;gap:2px}
+.stat-val,.stat-val.sm{font-size:15px}
+.page-banner h1{font-size:32px}
+}

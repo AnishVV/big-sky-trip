@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noindex,nofollow">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Big Sky">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Experts Only – Big Sky | Trip Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +53,18 @@
 </svg>
 
 <div class="stage" id="stage">
-  <aside class="sidebar">
+  <header class="topbar" id="topbar">
+    <a class="tb-brand" href="#/home" aria-label="Home"><svg><use href="#i-logo"/></svg><span id="tbTitle">Experts Only</span></a>
+  </header>
+  <nav class="tabbar" id="tabbar" aria-label="Primary">
+    <a data-tab="home" href="#/home"><svg><use href="#i-home"/></svg><span>Home</span></a>
+    <a data-tab="itinerary" href="#/itinerary"><svg><use href="#i-cal"/></svg><span>Itinerary</span></a>
+    <a data-tab="explore" href="#/explore"><svg><use href="#i-pin"/></svg><span>Explore</span></a>
+    <a data-tab="bookings" href="#/bookings"><svg><use href="#i-ticket"/></svg><span>Bookings</span></a>
+    <button id="moreBtn" type="button" aria-label="More pages" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span>More</span></button>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+  <aside class="sidebar" id="sidebar">
     <a class="brand" href="#/home">
       <svg class="brand-logo"><use href="#i-logo"/></svg>
       <div class="brand-name">EXPERTS<br>ONLY</div>
