@@ -48,6 +48,7 @@
     <symbol id="i-car" viewBox="0 0 24 24"><path fill="currentColor" d="M5 11l1.500-4.500A2 2 0 0 1 8.400 5h7.200a2 2 0 0 1 1.900 1.500L19 11a2 2 0 0 1 2 2v4h-2v2h-3v-2H8v2H5v-2H3v-4a2 2 0 0 1 2-2zm2.200 0h9.600l-1-3H8.200zM6.500 13.500a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400zm11 0a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400z"/></symbol>
     <symbol id="i-ski" viewBox="0 0 24 24"><path fill="currentColor" d="M3 20 21 15v2L3 22zM14 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM9 9l5-1 3 3 3 .6-.4 1.900-3.900-.8-2-2-1 2 2.500 2.500-.7 4-2-.4.5-3.200L8.500 13z"/></symbol>
     <symbol id="i-snow" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.800" stroke-linecap="round" fill="none"><path d="M12 2v20M3.300 7l17.400 10M3.300 17 20.700 7"/><path d="m9 3.500 3 2.500 3-2.500M9 20.500 12 18l3 2.500"/></g></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.600 10.800a15.100 15.100 0 0 0 6.600 6.600l2.200-2.200a1 1 0 0 1 1-.25 11.400 11.400 0 0 0 3.600.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.500a1 1 0 0 1 1 1c0 1.250.2 2.450.57 3.600a1 1 0 0 1-.25 1z"/></symbol>
     <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/></symbol>
   </defs>
 </svg>
@@ -60,7 +61,8 @@
     <a data-tab="home" href="#/home"><svg><use href="#i-home"/></svg><span>Home</span></a>
     <a data-tab="itinerary" href="#/itinerary"><svg><use href="#i-cal"/></svg><span>Itinerary</span></a>
     <a data-tab="explore" href="#/explore"><svg><use href="#i-pin"/></svg><span>Explore</span></a>
-    <a data-tab="bookings" href="#/bookings"><svg><use href="#i-ticket"/></svg><span>Bookings</span></a>
+    <a data-tab="travel" href="#/travel"><svg><use href="#i-plane"/></svg><span>Logistics</span></a>
+    <a data-tab="budget" href="#/budget"><svg><use href="#i-wallet"/></svg><span>Budget</span></a>
     <button id="moreBtn" type="button" aria-label="More pages" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg><span>More</span></button>
   </nav>
   <div class="scrim" id="scrim"></div>
@@ -78,7 +80,7 @@
       <a data-route="travel" href="#/travel"><svg><use href="#i-plane"/></svg>Travel &amp; Logistics</a>
       <a data-route="bookings" href="#/bookings"><svg><use href="#i-ticket"/></svg>Bookings</a>
       <a data-route="budget" href="#/budget"><svg><use href="#i-wallet"/></svg>Budget</a>
-      <a data-route="tasks" href="#/tasks"><svg><use href="#i-check"/></svg>Tasks &amp; Crew</a>
+      <a data-route="tasks" href="#/tasks"><svg><use href="#i-check"/></svg>Tasks</a>
     </nav>
     <div class="side-divider"></div>
     <div class="side-foot">
@@ -88,7 +90,6 @@
   </aside>
   <main class="main">
     <div class="hero-top">
-      <div class="avatars" id="avatars"></div>
       <button class="bell" aria-label="Notifications" id="bell"><svg><use href="#i-bell"/></svg><i id="bellDot"></i></button>
     </div>
     <div id="view"></div>

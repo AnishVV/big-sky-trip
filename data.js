@@ -2,22 +2,40 @@
 // flag:true = unconfirmed / needs re-check (shown with an amber tag).
 const EVENT = { start:'2027-03-13', end:'2027-03-14', today:()=>new Date() };
 
+/* Tasks. who:'me' (default) = each person does it for themselves; who:'group' = organizer / shared, shown in a collapsed card.
+   w = when it matters (timeline bucket). cost = per-person cost chip. due = sourced date or window. links = [label, url] from the vault notes.
+   Keep ids stable: checked state is saved by id in the browser. Notes come from the vault notes in Budgeting/, Skiing/, Lodging/, Big Sky Logistics/. */
+const WHEN = [
+  {id:'now',  label:'Do now',             sub:'Do these first'},
+  {id:'dec',  label:'By Dec 10',          sub:'Decide your ski days before Ikon Session passes stop selling'},
+  {id:'feb',  label:'By February',        sub:'Book your travel'},
+  {id:'watch',label:'Watch for (Jan–Feb)',sub:'Turn on alerts so you see announcements first'},
+  {id:'late', label:'Closer to the trip', sub:'Book gear and pack'}
+];
 const TASKS = [
-  {id:1, t:'Buy festival tickets (2-day)', done:true, g:'Done', note:'$420 each, Flicket, final sale'},
-  {id:2, t:'Book lodging: The House that Jack Built', done:true, g:'Done', note:'Booked. $8,904 for 4 nights'},
-  {id:3, t:'Research lift tickets, Ikon pass & rentals', done:true, g:'Done', note:'See Budget + Bookings'},
-  {id:4, t:'Confirm final headcount', g:'Group', note:'Sets lodging: $1,113 at 8, $636 at 14, $557 at 16'},
-  {id:5, t:'Collect each person\'s house share from whoever paid', g:'Group'},
-  {id:7, t:'Check the bunk beds are adult-sized (house sleeps 16)', g:'Lodging'},
-  {id:8, t:'Book flights into BZN (in Fri Mar 12, out Tue Mar 16)', g:'Travel', note:'~$500 cash or ~40k points'},
-  {id:9, t:'Reserve rental cars (AWD / winter tires, ~3 cars)', g:'Travel', note:'Est. $452.84 per car'},
-  {id:10, t:'Price Ikon Session 2-day + Lone Peak Tram fee', g:'Skiing'},
-  {id:11, t:'Buy lift tickets / passes for Mar 13–14', g:'Skiing'},
-  {id:12, t:'Reserve ski/snowboard rentals (online 24h+ ahead = 20% off)', g:'Skiing'},
-  {id:13, t:'Check Experts Only package + EO Express shuttle price', g:'Festival'},
-  {id:14, t:'Make dinner reservations (check vegetarian options)', g:'Food'},
-  {id:15, t:'Set a "do not exceed" per-person number', g:'Money'},
-  {id:16, t:'Watch for lineup & gate times (expected Jan–Feb 2027)', g:'Festival'}
+  // ---- Done ----
+  {id:1,  w:'now', g:'Festival', t:'Book festival tickets (2-day)', done:true, cost:'$420', note:'Flicket, final sale. 21+ with photo ID', links:[['Experts Only Big Sky','https://expertsonlybigsky.com/']]},
+  {id:2,  w:'now', g:'Lodging',  t:'Book lodging: The House that Jack Built', done:true, note:'$8,904 for 4 nights. Fri Mar 12 3 PM to Tue Mar 16 10 AM'},
+  {id:26, w:'now', g:'Travel',   t:'Book rental cars', done:true, note:'AWD / winter tires, ~3 cars for the group'},
+  // ---- Your checklist (each person) ----
+  {id:8,  w:'feb', g:'Travel',   t:'Book flights into BZN (in Fri Mar 12, out Tue Mar 16)', cost:'~$500 or ~40k pts', note:'Airbnb check-in is Fri 3 PM, check-out Tue 10 AM. Allow ~1h15 drive from BZN. Points break-even is about 1.25¢/pt', links:[['Google Flights: LA (LAX, BUR, LGB)','https://www.google.com/travel/flights?q=Flights+from+LAX,BUR,LGB+to+BZN+on+2027-03-12+through+2027-03-16'],['Google Flights: DFW (DFW, DAL)','https://www.google.com/travel/flights?q=Flights+from+DFW,DAL+to+BZN+on+2027-03-12+through+2027-03-16'],['Google Flights: Edison (EWR, PHL)','https://www.google.com/travel/flights?q=Flights+from+EWR,PHL+to+BZN+on+2027-03-12+through+2027-03-16'],['PointsYeah: LAX','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=LAX&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false'],['PointsYeah: BUR','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=BUR&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false'],['PointsYeah: LGB','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=LGB&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false'],['PointsYeah: DFW','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=DFW&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false'],['PointsYeah: DAL','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=DAL&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false'],['PointsYeah: EWR','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=EWR&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false'],['PointsYeah: PHL','https://www.pointsyeah.com/search?cabins=Economy&cabin=Economy&tripType=2&adults=1&children=0&departure=PHL&arrival=BZN&departDate=2027-03-12&departDateSec=2027-03-12&returnDate=2027-03-16&returnDateSec=2027-03-16&multiday=false']]},
+  {id:10, w:'dec', g:'Skiing',   t:'Decide how many days you\'ll ski (none, 1 or 2), then buy your lift ticket', due:'Decide by Dec 10', cost:'$0 / ~$200 / $369', note:'Ikon Session passes appear to stop selling Dec 10: that is the price-valid-until date in Ikon\'s page data, and guides say early to mid December. Ikon has not published a hard cutoff.', opts:[['No days','Nothing to buy. Skip the rental task below.'],['1 day','Buy a day ticket on the Big Sky site. About $200/day (estimate; no official Mar 13–14 price yet).'],['2 days','Buy the Ikon Session Pass, 2-day: $369 adult (23+). The Lone Peak Tram is not included. Mar 13–14 are not blackout dates.']], links:[['Big Sky lift tickets','https://shop.bigskyresort.com'],['Ikon Session Pass','https://www.ikonpass.com/en/shop-passes/ikon-session-pass']]},
+  {id:16, w:'watch', g:'Festival', t:'Turn on alerts for lineup and gate times', due:'Expected Jan–Feb 2027', note:'Follow @expertsonly and @johnsummit, sign up for the Explore Big Sky Town Crier, watch Flicket emails', links:[['Experts Only on Instagram','https://www.instagram.com/expertsonly']]},
+  {id:12, w:'late', g:'Skiing',   t:'Reserve your ski / snowboard rental (if you\'re skiing)', due:'24 h+ ahead for 20–25% off', cost:'~$100 (2 days)', note:'Slope side or Mountain Village preferred (Big Sky Sports). Cheapest verified: East Slope ski $35/day, board $40. Demo is $60–64/day. Early pickup 2:00–4:30 pm the day before, so grab gear Fri Mar 12', links:[['Big Sky Sports','https://www.bigskyresort.com/rentals/equipment-rental'],['Christy Sports','https://www.christysports.com/store-locations/big-sky-mountain-village.html'],['East Slope','http://eastslope.squarespace.com/ski-rentals']]},
+  {id:28, w:'late', g:'Festival', t:'Bring valid photo ID (21+); pack a second ID to be safe', note:'Whistler required two IDs. No re-entry once you leave the show'},
+  {id:29, w:'late', g:'Packing',  t:'Pack for the cold', note:'Layers, warm jacket, hat, gloves, traction boots, hand & toe warmers. March lows ~12–17 °F; you will stand outside for hours'},
+  // ---- Group / organizer ----
+  {id:4,  who:'group', w:'now',   g:'Group',   t:'Confirm final headcount', note:'Sets lodging: $1,113 at 8, $636 at 14, $557 at 16'},
+  {id:5,  who:'group', w:'now',   g:'Money',   t:'Collect each person\'s house share', note:'$8,904 total'},
+  {id:7,  who:'group', w:'now',   g:'Lodging', t:'Check the bunk beds are adult-sized', note:'House sleeps 16: 4 kings + 2 bunk rooms of 4'},
+  {id:17, who:'group', w:'dec',   g:'Skiing',  t:'Get Big Sky Sports rental prices and compare with Christy', due:'Re-check by Dec 1', note:'Prices only show in its booking flow. Christy demo is $63.96/day online'},
+  {id:18, who:'group', w:'dec',   g:'Skiing',  t:'Ask for group rental quotes', note:'Big Sky Sports (800) 548-4486, East Slope 406-995-4369, Gallatin Alpine 406-995-2313. None publish a group rate'},
+  {id:13, who:'group', w:'watch', g:'Festival',t:'Check Experts Only package + EO Express shuttle price', note:'Price the bundle against buying separately', links:[['Packages','https://travel.expertsonlyrecs.com/big-sky-packages']]},
+  {id:21, who:'group', w:'watch', g:'Festival',t:'Get the venue parking map and plan a ride home both nights', note:'Not published yet. Email events@theoutlawpartners.com. Rideshare is "very limited"'},
+  {id:14, who:'group', w:'late',  g:'Food',    t:'Make dinner reservations (check vegetarian options)', note:'Decide which dinners are out vs cooked; the house has 2 full kitchens'},
+  {id:22, who:'group', w:'late',  g:'Food',    t:'Plan groceries: shared pot or per person, and who shops', note:'Roxy\'s Market, Town Center, 8 am–9 pm. Arrive Fri Mar 12'},
+  {id:19, who:'group', w:'late',  g:'Lodging', t:'Save booking confirmation, house rules and cancellation policy', note:'Also confirm amenities (ski storage, hot tub)'},
+  {id:3,  who:'group', w:'now',   g:'Skiing',  t:'Research lift tickets, Ikon pass & rentals', done:true, note:'See Budget + Bookings'}
 ];
 
 const ITINERARY = [
@@ -81,7 +99,7 @@ const BOOKINGS = [
   {item:'Lodging', status:'Booked', detail:'The House that Jack Built, 397 Beaver Creek Rd. Fri Mar 12 3 PM → Tue Mar 16 10 AM. 4.96★ (77 reviews). 6 BR, sleeps 16 (4 kings + 2 bunk rooms of 4). Two kitchens.', cost:'$8,904 total', href:'https://www.airbnb.com/rooms/41831383'},
   {item:'Flights', status:'Not booked', detail:'Into Bozeman (BZN) Fri Mar 12, out Tue Mar 16. Cash ~$500 or ~40k points (≈1.25¢/pt break-even).', cost:'~$500 pp'},
   {item:'Rental cars', status:'Not booked', detail:'~3 cars for 14 (about 5 each). Estimate $452.84/car + ~$80 gas & parking. AWD / winter tires.', cost:'$114 pp'},
-  {item:'Lift tickets', status:'Not booked', detail:'Ikon Session 2-day from $369 (tram not included) vs ~$200/day weekend window. No official Mar 13–14 price found.', cost:'$300–400 pp', flag:'Check shop.bigskyresort.com'},
+  {item:'Lift tickets', status:'Not booked', detail:'Ikon Session 2-day $369 adult (tram not included; passes appear to stop selling Dec 10) vs ~$200/day weekend window. No official Mar 13–14 price found.', cost:'$300–400 pp', flag:'Check shop.bigskyresort.com'},
   {item:'Gear rental', status:'Not booked', detail:'Slope side or Mountain Village preferred (Big Sky Sports). Book online 24h+ ahead (20–25% off walk-in). House is not near the shops; Big Sky Sports delivery is $49/skier.', cost:'~$100 pp'},
   {item:'EO Express shuttle', status:'Unknown', detail:'Bozeman → arena, both days. Ticket add-on only as far as found.', cost:'Price unknown', flag:'Unverified'},
   {item:'Dinner reservations', status:'Not booked', detail:'Vegetarian options: Blue Buddha Sushi Lounge, Thai Basil, Niseko Ramen, By Word of Mouth, Blindside Burger (call about stock/fish sauce).', cost:'—'}
@@ -121,22 +139,115 @@ const FESTIVAL = {
   songs:'Where You Are (feat. Hayla), Shiver, Go Back, Deep End. Style: tech house / melodic house.'
 };
 
+/* Travel & Logistics. Source notes: vault "Big Sky Logistics" folder (seen 2026-11-16). Anything flagged is an estimate or a single weak source. */
+const telLink = (num, label) => `<a class="tel" href="tel:${num.replace(/[^\d+]/g,'')}">${label || num}</a>`;
 const TRAVEL = {
-  getting:[
-    ['Fly','Bozeman Yellowstone Intl (BZN), ~51 mi / 1h15 to Big Sky.'],
-    ['Drive','US-191 through Gallatin Canyon, then MT-64. Check Montana 511 / mdt.mt.gov/travinfo. Closures have happened after crashes.'],
-    ['Airport shuttles','Big Sky Shuttle (book 7 days ahead, 866-661-6836), Rocks2Rocks, Natural Retreats. Private transfer listed $179–$300 (no 2027 prices).'],
-    ['EO Express','Event shuttle Bozeman → arena. Ticket add-on; details later.'],
-    ['Skyline Transit','Local bus, reportedly free. 2026–27 evening schedule not found; Skyline Connect on-demand in Town Center / Meadow / Mountain Village.'],
-    ['Rideshare','"Very limited". Plan a confirmed ride home both nights.']
+  /* QUICK REFERENCE (top of page). Addresses: BZN and the resort from their own sites (checked 2026-11-16); the rest from vault notes.
+     places: [name, address, 'from the house', maps query, unverified?] */
+  quick:{
+    places:[
+      ['The house','397 Beaver Creek Rd, off US-191 in Gallatin Canyon (mail: Gallatin Gateway, MT 59730)','Home base. Free garage. Not walkable to anything','397 Beaver Creek Rd, Gallatin Gateway, MT 59730'],
+      ['Airport (BZN)','850 Gallatin Field Rd, Belgrade, MT 59714','45–60 min drive; 1.5–2 h in snow','Bozeman Yellowstone International Airport, 850 Gallatin Field Rd, Belgrade, MT',true],
+      ['Show: Big Sky Events Arena','450 Aspen Leaf Dr, Town Center, MT 59716','About 10–15 min drive','Big Sky Events Arena, 450 Aspen Leaf Dr, Big Sky, MT',true],
+      ['Ski: Big Sky Resort','50 Big Sky Resort Rd, Mountain Village, MT 59716','About 10–15 min drive (listing)','Big Sky Resort, 50 Big Sky Resort Rd, Big Sky, MT',true],
+      ['Ski rentals','Christy Sports, 11 Lone Peak Dr · East Slope Outdoors, 44 Town Center Ave','Town Center, same trip as the arena','Christy Sports, 11 Lone Peak Dr, Big Sky, MT'],
+      ['Groceries','Roxy\'s Market, 20 Huntley Dr (8 am–9 pm), Town Center','Town Center. Bulk stock-up: Costco in Bozeman','Roxy\'s Market, 20 Huntley Dr, Big Sky, MT']
+    ],
+    /* tag text, tag class, label, detail */
+    rides:[
+      ['No','bad','Uber / Lyft','The resort says they are not available in Big Sky. Do not count on them.'],
+      ['Yes','ok','Own car (plan: 3 AWD cars)','Needed anyway: the house is not walkable to the arena or the resort. Pick a sober driver for show nights.'],
+      ['Maybe','mid','Taxi','Lone Peak Taxi 406-640-2865 (AWD). Late hours for show nights are unverified, so book ahead.'],
+      ['Free','ok','Skyline bus + Big Sky Connect','Buses run until 12:45 am from Town Center; Connect (on demand) until 11 pm. Neither is confirmed to reach Beaver Creek Rd.'],
+      ['None','bad','Public transit from BZN','Skyline does not serve the airport. Use a rental car or the Big Sky Shuttle.']
+    ],
+    /* road facts people ask first */
+    distances:[
+      ['BZN → Bozeman','~8–10 mi, 15–20 min'],
+      ['Bozeman → Big Sky','~45 mi, about 1 h clear'],
+      ['BZN → Big Sky resort','~47–50 mi, 1 h to 1 h 15 (winter longer)'],
+      ['Gallatin Gateway → house','~35 mi up the canyon; Gateway is not the house']
+    ]
+  },
+  /* show-night rides: tag text, tag class, title, detail */
+  rides:[
+    ['Best','ok','Own car, sober driver','Simplest. Free garage at the house. Pick the driver before each show night. The canyon in the dark in March needs care.'],
+    ['Backup','mid','Pre-booked taxi or shuttle',`${telLink('406-640-2865','Lone Peak Taxi')} (AWD, airport transfers), Big Sky Bound (listed 24 h) and ${telLink('406-551-3553','Mountain & Canyon Cab')} (unverified). Get a reservation number and confirm the late pickup price. Late hours are unverified.`],
+    ['Short hop','mid','Skyline Connect (free, on demand)','Town Center until 11 pm, from the arena area to lodging in Town Center or Meadow. Not confirmed to reach Beaver Creek Rd.'],
+    ['Unlikely','bad','Skyline Route 4 bus','Leaves Town Center until 12:45 am, but the last timed run to the canyon end (Buck\'s T-4) is 9:56 pm, then request-stop only. A show ending at 11 pm likely misses it.'],
+    ['Unknown','mid','EO Express shuttle','Listed as Bozeman to the arena only, no return leg. Pickup points and times come "closer to the event".'],
+    ['No','bad','Uber / Lyft','Big Sky Resort says they are not available. Do not count on them.']
+  ],
+  showPlan:[
+    'Pick a sober driver for each show night and rotate.',
+    'Save a taxi number in everyone\'s phone and confirm late pickup ahead of time.',
+    'Leave the house early: security and mountain roads take time.',
+    'Check 511 and the forecast before driving back in the dark.',
+    'Stay in Big Sky overnight. Many Vail attendees drove home the same night; don\'t do that through Gallatin Canyon.'
+  ],
+  /* airport to the house */
+  airport:[
+    {pick:true, tag:'Plan of record', t:'3 AWD SUVs',
+     pro:['Flexible for groceries, split arrivals and show nights','The house is not walkable to the arena, so you need cars anyway'],
+     con:['Three drivers in the canyon','AWD inventory at BZN may sell out; book early (2–4 months is a rule of thumb, not sourced)']},
+    {tag:'Option', t:'2 large vans',
+     pro:['Group stays together, fewer drivers','Easier for luggage and ski gear'],
+     con:['Van inventory at BZN is unverified; one Turo Ford Transit wagon lead','Check AWD or winter tires and driver age rules']},
+    {tag:'Unverified', t:'Airport shuttle',
+     pro:['No driving; lowest winter risk','Big Sky Shuttle serves Town Center and the resort'],
+     con:['Does not solve show nights or groceries; you still need cars','Pickup timing and luggage limits unconfirmed']}
+  ],
+  /* Skyline and parking */
+  around:[
+    ['Skyline local buses','Free, 7 days, Nov 23 to Apr 11. Routes 3 and 4 link Town Center, Meadow Village and Mountain Village; the last Town Center departure is 12:45 am.'],
+    ['Big Sky Connect','Free on-demand rides. Town Center, Meadow and Confluence 6 am–11 pm; Mountain Village 7:30 am–9:30 pm. Booked in the Connect app.'],
+    ['Link to Bozeman','$5 cash, exact fare. Bozeman to Big Sky only, not the airport.'],
+    ['Near the house','No confirmed stop on Beaver Creek Rd. Nearest listed canyon stops are Buck\'s T-4 and Whitewater Inn.']
+  ],
+  parking:[
+    ['Arena','Not published. A 2019 paid lot on Simkins and Aspen Leaf was $20 cash, so treat as outdated. A map for accessible parking is due before the event.', true],
+    ['Resort','Most Mountain Village lots are free, with shuttles every few minutes 8 am–6 pm. They fill on weekends, event days and powder days, so Sat–Sun Mar 13–14 will be busy.'],
+    ['Overnight','Not allowed in Town Center or at the resort. Cars can be ticketed, booted or towed.'],
+    ['Snow','The festival warns there will be snow on the ground, which can affect routes around the venue.']
+  ],
+  roads:[
+    ['Check first','Call 511 (800-226-7623 from outside Montana), use 511mt.net or the MT 511 app.'],
+    ['Time it','~1 h clear, ~1.5 h with road work, 1.5–2 h in snow (estimate).'],
+    ['Closures','Crashes are the main cause. Two 2025 closures lasted about 2–2.5 h, so have a fallback.'],
+    ['Cell service','Poor to none through much of the canyon. Download maps and music first.'],
+    ['Fuel','Fill up in Bozeman. Canyon stations are few and pricier.'],
+    ['Chains','Not required for passenger cars; the rule is for towing units. Winter tires help stopping more than AWD does (general advice).'],
+    ['Wildlife','Elk and bighorn on the road, worst near the canyon mouth and the US-191 / MT-64 junction. Dawn and dusk are riskiest. Don\'t swerve.'],
+    ['Pack','Shovel, ice scraper, warm layers.']
   ],
   tips:[
-    ['Altitude','Town Center ~6,200 ft, Mountain Village ~7,500 ft. CDC: avoid alcohol first 48 h; drink water. Consider arriving early.'],
-    ['Cold','March highs mid-30s–mid-40s °F, lows ~12–17 °F. Below freezing after dark; standing outside for hours.'],
-    ['Stay in Big Sky','Many Vail attendees drove home the same night. Don\'t do that through Gallatin Canyon.'],
-    ['Avalanche','Resort terrain is patrolled; backcountry: mtavalanche.com.']
+    ['Altitude','Town Center ~6,200 ft, Mountain Village ~7,500 ft. CDC: avoid alcohol the first 48 h and drink water. Consider arriving early.'],
+    ['Cold','March highs mid-30s to mid-40s °F, lows ~12–17 °F. Below freezing after dark, and you will be standing outside for hours.'],
+    ['Avalanche','Resort terrain is patrolled. Backcountry: mtavalanche.com.']
   ],
-  carMath:[['5 per car','$107 pp'],['4 per car','$133 pp'],['3 per car','$178 pp']]
+  stops:[
+    ['Costco, Bozeman','Catron St. Hours and liquor sales not checked. Best place for bulk groceries.', true],
+    ['Spirits','Montana sells spirits only in state agency liquor stores; beer and wine are in grocery stores. In Big Sky: The Cave Spirits & Gifts and The Rocks Tasting Room, both Town Center. The Rocks is reported to be moving into the Cave\'s old space, so confirm.'],
+    ['Groceries','Roxy\'s Market (8 am–9 pm) and Hungry Moose Market & Deli, both in Town Center.'],
+    ['Veg check','Nobody has checked the delis for hidden meat stocks. Read labels and ask.']
+  ],
+  calls:[
+    ['Road conditions','511','511','Montana road report; 800-226-7623 outside MT'],
+    ['Big Sky Shuttle','866-661-6836','866-661-6836','Airport transfers. Book ahead'],
+    ['Lone Peak Taxi','406-640-2865','406-640-2865','AWD taxi. Late hours unverified'],
+    ['Mountain & Canyon Cab','406-551-3553','406-551-3553','On-call taxi in Big Sky. Name and airport service unverified'],
+    ['Skyline Bus','406-995-6287','406-995-6287','Ask about stops near Beaver Creek Rd'],
+    ['Ski Patrol','406-995-5880','406-995-5880','Or any lift terminal. Emergencies: 911'],
+    ['Resort Mountain Services','800-548-4486','800-548-4486','Tickets, passes, lessons']
+  ],
+  unknown:[
+    'Arena parking map and lot rules (email events@theoutlawpartners.com)',
+    'EO Express pickup points, times and whether it runs back',
+    'Gate and set times, so the late-night window is not sized yet',
+    'Whether Skyline or Connect stops near Beaver Creek Rd',
+    'The real BZN → house drive time. Sources disagree on where the house sits along US-191',
+    'Whether any taxi will take a late pickup on Mar 13–14'
+  ]
 };
 
 /* ll = [lat, lng] from OpenStreetMap geocoding (Nominatim). approx:true = street-level or road-level guess, not the exact building.
@@ -195,12 +306,14 @@ const EXPLORE = [
 const CATS = {fest:'Festival', ski:'Ski Resort', rent:'Rentals', food:'Food & Drink', night:'Nightlife', act:'Activities', taco:'Taco Bell', prac:'Practical', stay:'Lodging', go:'Getting There'};
 const CAT_COLOR = {fest:'#e4572e', ski:'#5b84e8', rent:'#3fb6c9', food:'#e9b44c', night:'#b66bd6', stay:'#6fcf97', go:'#a8a29b', act:'#f08a5d', taco:'#a855f7', prac:'#8ab4f8'};
 
-const OPEN_Q = [
-  'Final headcount and who is skiing',
-  'Real Mar 13–14 lift price and 2-day Ikon price; tram fee',
-  'Vehicle plan and EO Express price',
-  'Gate/set times and lineup (watch Jan–Feb)',
-  'Points or cash for flights'
+const OPEN_Q = [  // facts we are waiting on someone else for (actions live in TASKS)
+  'Lineup beyond John Summit',
+  'Gate and set times for both nights',
+  'When March 2027 lift dates go on sale, and how fast prices climb',
+  'EO Express price, pickup times and whether there is a return leg',
+  'Skyline Transit evening schedule and Big Sky Connect hours',
+  'Day parties, afterparties and pop-ups (and whether they need a lift ticket)',
+  'Vegetarian food at the venue'
 ];
 
 /* ===== NON-SKIING ACTIVITIES (from Non Skiing/Non-Skiing Activities.md; prices undated, none confirmed for Mar 2027) ===== */

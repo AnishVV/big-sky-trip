@@ -11,7 +11,7 @@ const store = {
 
 /* ===== scale to window ===== */
 const stage = $('#stage');
-const mq = matchMedia('(max-width:900px)');          /* same breakpoint as the @media block in styles.css */
+const mq = matchMedia('(max-width:1180px)');         /* same breakpoint as the fluid @media block in styles.css (below it the 1672px canvas would be shrunk past readability) */
 const isMobile = () => mq.matches;
 function fit(){
   document.body.classList.toggle('mobile', isMobile());
@@ -32,20 +32,14 @@ $('#scrim').onclick = () => setMenu(false);
 addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 
 /* ===== state ===== */
-const doneSet = new Set(store.get('done', TASKS.filter(t=>t.done).map(t=>t.id)));
-const saveDone = () => store.set('done', [...doneSet]);
-const crew = store.get('crew', [{name:'You', note:'Organizer'}]).filter(c => !/vishal/i.test(c.name));
+const doneSet = new Set(store.get('done2', TASKS.filter(t=>t.done).map(t=>t.id)));
+const saveDone = () => store.set('done2', [...doneSet]);
+const MINE = TASKS.filter(t => t.who !== 'group'), GROUP = TASKS.filter(t => t.who === 'group');
+const nDone = list => list.filter(t => doneSet.has(t.id)).length;   /* count only tasks that still exist (saved state can hold old ids) */
 const daysTo = () => Math.max(0, Math.ceil((new Date(EVENT.start+'T00:00:00') - new Date()) / 864e5));
 const money = n => '$' + n.toLocaleString('en-US');
 
-/* avatars: first letters of crew (placeholder look) */
-function renderAvatars(){
-  const imgs = [1,2,3,4].map(i => `<img src="img/avatar${i}.jpg" alt="">`).join('');
-  $('#avatars').innerHTML = imgs + `<span class="more" title="Crew size TBD">+?</span>`;
-  $('#avatars').onclick = () => location.hash = '#/tasks';
-}
-renderAvatars();
-const pending = () => TASKS.filter(t => !doneSet.has(t.id)).length;
+const pending = () => MINE.length - nDone(MINE);
 $('#bellDot').textContent = pending();
 $('#bell').onclick = () => location.hash = '#/tasks';
 
@@ -66,12 +60,12 @@ function upcoming(n=3){
   return pick.slice(0, n);
 }
 function taskPreview(){
-  const done = TASKS.filter(t => doneSet.has(t.id)).slice(0,2);
-  const todo = TASKS.filter(t => !doneSet.has(t.id)).slice(0, 4 - done.length);
+  const done = MINE.filter(t => doneSet.has(t.id)).slice(0,2);
+  const todo = MINE.filter(t => !doneSet.has(t.id)).slice(0, 4 - done.length);
   return [...done, ...todo];
 }
 function viewHome(){
-  const total = TASKS.length, n = doneSet.size;
+  const total = MINE.length, n = nDone(MINE);
   const b = BUDGET;
   const other = b.perPerson - 420 - 636 - 500;
   return `
@@ -215,7 +209,7 @@ function bindExplore(){
   const [, , arg='all'] = location.hash.split('/');
   const cat = CATS[arg] ? arg : 'all';
   const pins = EXPLORE.filter(e => e.ll && (cat==='all' || e.cat===cat));
-  const map = exploreMap = L.map('map', {zoomControl:true, scrollWheelZoom:false, dragging:!isMobile()});   /* phones: one finger scrolls the page past the pinned map; pinch + buttons still zoom */
+  const map = exploreMap = L.map('map', {zoomControl:true, scrollWheelZoom:false, dragging:!(isMobile() && matchMedia('(pointer:coarse)').matches)});   /* touch: one finger scrolls the page past the map; pinch + buttons still zoom. Mouse always drags */
   const dark = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, className:'tiles-dark', attribution:'&copy; OpenStreetMap contributors'});
   const street = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, className:'', attribution:'&copy; OpenStreetMap contributors'});
   const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {maxZoom:17, attribution:'&copy; OpenStreetMap contributors, SRTM | OpenTopoMap'});
@@ -250,16 +244,67 @@ function bindExplore(){
 }
 
 /* ===== TRAVEL ===== */
+const secHead = (id, icon, title, sub) => `<div class="sec" id="sec-${id}"><span class="sec-ico">${ico(icon)}</span><div><h2>${title}</h2>${sub?`<p>${sub}</p>`:''}</div></div>`;
+const factRows = rows => dl(rows.map(([k,v,warn]) => [k, v + (warn ? ' ' + flagTag('Unverified') : '')]));
+const TRAVEL_NAV = [['quick','Quick facts'],['airport','Airport'],['show','Show nights'],['around','Around town'],['roads','Roads'],['stops','Stops'],['calls','Numbers']];
 function viewTravel(){
-  return banner('Travel & Logistics','Getting to, around and home from Big Sky') + `<div class="page">
-    <div class="note">The house is on Beaver Creek Rd, 10–15 min from the resort and <b>not</b> in Town Center where the arena and rental shops are. Plan cars and a sober driver for both show nights.</div>
+  const T = TRAVEL;
+  const mapQ = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  const places = T.quick.places.map(([n,addr,from,q,warn]) => `<li class="qp"><div class="qp-n">${n}</div><div class="qp-a"><a href="${mapQ(q)}" target="_blank" rel="noopener">${addr} ${ico('ext')}</a></div><div class="qp-d">${from}${warn?' '+flagTag('Estimate'):''}</div></li>`).join('');
+  const qrides = T.quick.rides.map(([tag,cls,t,d]) => `<li><span class="tag ${cls}">${tag}</span><div><b>${t}</b><span class="d">${d}</span></div></li>`).join('');
+  const airport = T.airport.map(o => `<section class="card oc ${o.pick?'pick':''}">
+      <div class="oc-top"><span class="tag ${o.pick?'ok':'mid'}">${o.tag}</span></div>
+      <h3>${o.t}</h3>
+      <ul class="pc pro">${o.pro.map(x=>`<li>${x}</li>`).join('')}</ul>
+      <ul class="pc con">${o.con.map(x=>`<li>${x}</li>`).join('')}</ul></section>`).join('');
+  const rides = T.rides.map(([tag,cls,t,d]) => `<li><span class="tag ${cls}">${tag}</span><div><b>${t}</b><span class="d">${d}</span></div></li>`).join('');
+  const calls = T.calls.map(([n,disp,href,w]) => `<a class="call" href="tel:${href.replace(/[^\d+]/g,'')}"><span class="call-ico">${ico('phone')}</span><span class="call-txt"><b>${n}</b><span class="num">${disp}</span><span class="w">${w}</span></span></a>`).join('');
+  return banner('Travel & Logistics','Getting to, around and home from Big Sky') + `<div class="page travel">
+    <div class="chips tnav" id="tnav">${TRAVEL_NAV.map(([k,l],i)=>`<button type="button" class="chip" data-jump="${k}">${l}</button>`).join('')}</div>
+
+    ${secHead('quick','pin','Quick facts','Addresses, distances and rides on one screen. Details follow below')}
+    ${card('Where things are', `<ul class="qps">${places}</ul><p class="sub">Tap an address to open it in Maps. Drive times are estimates until checked in Google Maps with a winter check.</p>`, 'qcard')}
     <div class="grid2">
-      ${card('Getting there & around', dl(TRAVEL.getting))}
-      ${card('Cold, altitude & safety', dl(TRAVEL.tips))}
-      ${card('Cars: cost per person', table(['People per car','Per person'], TRAVEL.carMath) + '<p class="sub">Rental est. $452.84/car + ~$80 gas & parking. At 14 people: 3 cars, $114 each.</p>')}
-      ${card('Flight plan', `<p>Fly into <b>BZN</b> Fri Mar 12; return Tue Mar 16 to match the house. ~$500 cash or ~40k points (break-even ≈ 1.25¢/pt). Check award taxes and March BZN award availability.</p>`)}
+      ${card('Rides and getting around', `<ul class="rides">${qrides}</ul>`)}
+      ${card('Distances', factRows(T.quick.distances))}
     </div>
+
+    <div class="more-div"><span>More detail</span></div>
+
+    ${secHead('airport','plane','From the airport','How the group gets from BZN to 397 Beaver Creek Rd')}
+    <div class="optcards">${airport}</div>
+
+    ${secHead('show','music','Show nights','Listed 5–11 pm each night. Gate and set times are still TBA')}
+    <div class="grid-tc">
+      ${card('Ways home from the arena', `<ul class="rides">${rides}</ul>`)}
+      <div>${card('Show-night game plan', `<ol class="plan">${T.showPlan.map(x=>`<li>${x}</li>`).join('')}</ol>`, 'planbox')}</div>
+    </div>
+
+    ${secHead('around','car','Around Big Sky','Free buses, on-demand rides and parking')}
+    <div class="grid2">
+      ${card('Buses & rides', factRows(T.around))}
+      ${card('Parking', factRows(T.parking))}
+    </div>
+
+    ${secHead('roads','snow','Roads & weather','US-191 through Gallatin Canyon is the one road in')}
+    <div class="grid2">
+      ${card('Driving the canyon', factRows(T.roads))}
+      ${card('Cold, altitude & safety', dl(T.tips))}
+    </div>
+
+    ${secHead('stops','cart','Groceries & liquor','Stock up before you reach the canyon')}
+    ${card('', factRows(T.stops))}
+
+    ${secHead('calls','phone','Numbers to save','Tap to call')}
+    <div class="calls">${calls}</div>
+    <div class="plinks bigl">${link('511 road conditions','https://www.511mt.net')} ${link('Skyline winter schedule','https://skylinebus.com/routes/winter')} ${link('BZN ground transportation','https://bozemanairport.com/ground-transportation')} ${link('Resort parking','https://bigskyresort.com/parking')} ${link('Know Before You Go','https://expertsonlybigsky.com/know-before-you-go/')}</div>
+
+    ${card('Still unknown', `<ul class="oq">${T.unknown.map(x=>`<li>${x}</li>`).join('')}</ul><p class="sub">Notes are from 16 Nov 2026 and drafts. Re-check fares, schedules and parking in February.</p>`)}
   </div>`;
+}
+function bindTravel(){
+  const chips = [...document.querySelectorAll('#tnav .chip')];
+  chips.forEach(b => b.onclick = () => document.getElementById('sec-'+b.dataset.jump).scrollIntoView({behavior:'smooth', block:'start'}));
 }
 
 /* ===== BOOKINGS ===== */
@@ -302,26 +347,43 @@ function bindBudget(){
   el.oninput = upd; sk.onclick = e => { const b=e.target.closest('button'); if(b){ d=+b.dataset.d; upd(); } }; upd();
 }
 
-/* ===== TASKS & CREW ===== */
+/* ===== TASKS ===== */
+let showGroup = false;   /* the group list stays open across re-renders */
+function taskRow(t){
+  const chips = `<span class="tg">${esc(t.g)}</span>` + (t.cost ? `<span class="tg cost">${esc(t.cost)}</span>` : '') + (t.due ? `<span class="tg due">${esc(t.due)}</span>` : '');
+  const links = t.links ? `<div class="tlinks">${t.links.map(l=>`<a class="ext" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join('')}</div>` : '';
+  const opts = t.opts ? `<div class="opts">${t.opts.map(o=>`<div class="opt"><b>${esc(o[0])}:</b> ${esc(o[1])}</div>`).join('')}</div>` : '';
+  return `<li data-id="${t.id}" class="${doneSet.has(t.id)?'done':''}" role="checkbox" aria-checked="${doneSet.has(t.id)}" tabindex="0"><span class="cb"></span><div class="tt"><div class="tn">${esc(t.t)}</div>${t.note?`<div class="sub">${esc(t.note)}</div>`:''}<div class="chips">${chips}</div>${opts}${links}</div></li>`;
+}
+const foldCard = (id, title, count, open, inner) => `<section class="card panel"><button class="donetoggle" id="${id}" aria-expanded="${open}"><h3>${title} <span class="cnt">${count}</span></h3><span class="chev">${open?'Hide':'Show'}</span></button>${open?inner:''}</section>`;
 function viewTasks(){
-  const groups = [...new Set(TASKS.map(t=>t.g))];
-  return banner('Tasks & Crew', `${doneSet.size} of ${TASKS.length} complete`) + `<div class="page">
+  const total = MINE.length, n = nDone(MINE), pct = Math.round(n / total * 100);
+  const open = MINE.filter(t => !doneSet.has(t.id)), done = MINE.filter(t => doneSet.has(t.id));
+  const buckets = WHEN.map(w => {
+    const items = open.filter(t => t.w === w.id);
+    return items.length ? card(`${w.label} <span class="cnt">${items.length}</span>`, `<p class="sub bk">${esc(w.sub)}</p><ul class="tasklist big">${items.map(taskRow).join('')}</ul>`) : '';
+  }).join('');
+  const body = open.length ? buckets : card('', '<p class="allclear">All your tasks are done. Nothing left to do.</p>');
+  const doneCard = done.length ? card(`Done <span class="cnt ok">${done.length}</span>`, `<ul class="tasklist big">${done.map(taskRow).join('')}</ul>`, 'donecard') : '';
+  const gOpen = GROUP.filter(t => !doneSet.has(t.id)).length;
+  const groupSorted = [...GROUP].sort((x,y) => (doneSet.has(x.id)) - (doneSet.has(y.id)) || WHEN.findIndex(w=>w.id===x.w) - WHEN.findIndex(w=>w.id===y.w));
+  const groupCard = foldCard('groupToggle', 'Organizer & group tasks', gOpen, showGroup, `<p class="sub bk">Shared items one person handles for everyone. You don't need to do these unless you're organizing.</p><ul class="tasklist big">${groupSorted.map(taskRow).join('')}</ul>`);
+  return banner('Tasks', `Your checklist · ${n} of ${total} done`) + `<div class="page">
+    <div class="progress" aria-label="${pct}% complete"><div class="bar"><i style="width:${pct}%"></i></div><span>${pct}%</span></div>
     <div class="grid-tc">
-      <div>${groups.map(g => card(g, `<ul class="tasklist big">${TASKS.filter(t=>t.g===g).map(t=>`<li data-id="${t.id}" class="${doneSet.has(t.id)?'done':''}"><span class="cb"></span><div>${esc(t.t)}${t.note?`<div class="sub">${esc(t.note)}</div>`:''}</div></li>`).join('')}</ul>`)).join('')}</div>
+      <div>${doneCard}${body}${groupCard}</div>
       <div>
-        ${card('Crew', `<ul class="crew">${crew.map((c,i)=>`<li><span class="av">${esc(c.name[0]||'?')}</span><div><b>${esc(c.name)}</b><div class="sub">${esc(c.note||'')}</div></div><button data-rm="${i}" aria-label="Remove">×</button></li>`).join('')}</ul>
-          <form id="crewForm"><input name="n" placeholder="Add a name" required><button class="btn outline">Add</button></form>
-          <p class="sub">Headcount is not final (8–16). Nothing here is shared; it saves in this browser only.</p>`)}
-        ${card('Open questions', `<ul class="oq">${OPEN_Q.map(q=>`<li>${esc(q)}</li>`).join('')}</ul>`)}
+        ${card('Waiting on others', `<ul class="oq">${OPEN_Q.map(q=>`<li>${esc(q)}</li>`).join('')}</ul>`)}
       </div>
     </div></div>`;
 }
 function bindTasks(){
-  document.querySelectorAll('.tasklist.big li').forEach(li => li.onclick = () => {
-    const id=+li.dataset.id; doneSet.has(id)?doneSet.delete(id):doneSet.add(id); saveDone(); render();
+  const toggle = li => { const id=+li.dataset.id; doneSet.has(id)?doneSet.delete(id):doneSet.add(id); saveDone(); render(); };
+  document.querySelectorAll('.tasklist.big li').forEach(li => {
+    li.onclick = e => { if (e.target.closest('a')) return; toggle(li); };   /* links open, they don't tick the box */
+    li.onkeydown = e => { if (e.target === li && (e.key===' ' || e.key==='Enter')){ e.preventDefault(); toggle(li); } };
   });
-  const f = $('#crewForm'); if(f) f.onsubmit = e => { e.preventDefault(); crew.push({name:f.n.value.trim()}); store.set('crew', crew); render(); };
-  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { crew.splice(+b.dataset.rm,1); store.set('crew',crew); render(); });
+  const gt = $('#groupToggle'); if (gt) gt.onclick = () => { showGroup = !showGroup; render(); };
 }
 
 /* ===== FESTIVAL ===== */
@@ -357,7 +419,7 @@ function viewActivities(cat='all'){
 }
 
 /* ===== router ===== */
-const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary,bindItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
+const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary,bindItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel,bindTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
 let lastHash = null;
 const PAGE_TITLE = {home:'Experts Only', festival:'Experts Only'};
 function render(){
@@ -374,7 +436,7 @@ function render(){
   const navLink = document.querySelector(`#nav a[data-route="${route}"]`);
   $('#tbTitle').textContent = PAGE_TITLE[route] || (navLink ? navLink.textContent.trim() : 'Experts Only');
   setMenu(false);
-  if (location.hash !== lastHash) window.scrollTo(0,0);   /* task / crew edits re-render in place without jumping */
+  if (location.hash !== lastHash) window.scrollTo(0,0);   /* task edits re-render in place without jumping */
   lastHash = location.hash;
 }
 addEventListener('hashchange', render);
