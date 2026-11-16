@@ -86,15 +86,15 @@ function viewHome(){
       <a class="btn outline" href="#/itinerary">View Full Itinerary ${ico('arrow')}</a>
     </div>
     <div class="card explore">
-      <img class="bg" src="img/map.jpg" alt="">
+      <div id="miniMap"></div>
       <div class="card-head">${ico('pin','pin-sm')}<h2>EXPLORE BIG SKY</h2></div>
       <a class="btn outline mapbtn" href="#/explore">View Map ${ico('arrow')}</a>
-      <a class="pill" href="#/explore/ski" style="left:191px;top:83px">${ico('mtn')}Ski Resort</a>
-      <a class="pill" href="#/explore/food" style="left:515px;top:119px">${ico('fork')}Restaurants</a>
-      <a class="pill" href="#/explore/fest" style="left:327px;top:158px">${ico('music')}Festival</a>
-      <a class="pill" href="#/explore/stay" style="left:573px;top:191px">${ico('bed')}Lodging</a>
-      <span class="cdot" style="left:383px;top:204px"></span>
-      <div class="zoom"><button>+</button><button>−</button></div>
+      <div class="legend">
+        <a class="pill" href="#/explore/ski"><i style="background:${CAT_COLOR.ski}"></i>Ski Resort</a>
+        <a class="pill" href="#/explore/fest"><i style="background:${CAT_COLOR.fest}"></i>Festival</a>
+        <a class="pill" href="#/explore/food"><i style="background:${CAT_COLOR.food}"></i>Restaurants</a>
+        <a class="pill" href="#/explore/stay"><i style="background:${CAT_COLOR.stay}"></i>Lodging</a>
+      </div>
     </div>
   </section>
 
@@ -130,7 +130,19 @@ function viewHome(){
   </section>
   </div>`;
 }
+let homeMap = null;
 function bindHome(){
+  const mm = document.getElementById('miniMap');
+  if (mm && window.L) {
+    if (homeMap){ homeMap.remove(); homeMap = null; }
+    const map = homeMap = L.map(mm, {zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false, touchZoom:false});
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, className:'tiles-dark'}).addTo(map);
+    const pts = EXPLORE.filter(e => e.ll && !e.far && ['fest','stay','food'].includes(e.cat) || (e.ll && e.name.startsWith('Big Sky Resort')));
+    pts.forEach(e => L.marker(e.ll, {interactive:false, icon:L.divIcon({className:'', html:`<span class="mk sm" style="background:${CAT_COLOR[e.cat]}"></span>`, iconSize:[14,14], iconAnchor:[7,7]})}).addTo(map));
+    map.fitBounds(pts.map(e => e.ll), {paddingTopLeft:[30,60], paddingBottomRight:[30,60]});
+    mm.onclick = () => { location.hash = '#/explore'; };
+    setTimeout(() => map.invalidateSize(), 50);
+  }
   document.querySelectorAll('#homeTasks li').forEach(li => li.onclick = () => {
     const id = +li.dataset.id; doneSet.has(id) ? doneSet.delete(id) : doneSet.add(id); saveDone(); render();
   });
@@ -140,8 +152,11 @@ function bindHome(){
 function viewItinerary(){
   return banner('Itinerary','Fri Mar 12 – Tue Mar 16, 2027 · Big Sky, Montana') + `<div class="page">
     <div class="note warn">Gate and set times are not published. The 5–11 pm window is from the Town Center listing. Lineup beyond John Summit is TBA (past editions announced 1–7 weeks out).</div>
-    ${ITINERARY.map(d => `<section class="card panel day"><div class="day-h"><h3>${d.date}</h3></div>
-      <ol class="tl">${d.items.map(i => `<li>${ico(i.icon)}<div><strong>${esc(i.t)}</strong> ${i.flag?flagTag(i.flagText):''}<div class="sub">${esc(i.sub)}</div><p>${esc(i.note||'')}</p></div></li>`).join('')}</ol></section>`).join('')}
+    <div class="itin-grid">${ITINERARY.map(d => { const [wd,mo,dn] = d.date.split(' ');
+      const show = d.items.some(i => /Show/.test(i.t));
+      return `<section class="card day ${show?'show':''}">
+      <div class="day-side"><div class="day-wd">${wd}</div><div class="day-n">${dn}</div><div class="day-mo">${mo}</div>${show?'<div class="day-badge">Festival</div>':''}</div>
+      <ol class="tl">${d.items.map(i => `<li><span class="tl-ico">${ico(i.icon)}</span><div class="tl-body"><div class="tl-title"><strong>${esc(i.t)}</strong> ${i.flag?flagTag(i.flagText):''}</div><div class="sub">${esc(i.sub)}</div>${i.note?`<p>${esc(i.note)}</p>`:''}</div></li>`).join('')}</ol></section>`; }).join('')}</div>
   </div>`;
 }
 
@@ -303,7 +318,7 @@ function viewActivities(cat='all'){
   const cards = list.map(a => `<section class="card panel act">
     <h3>${esc(a.name)} ${a.flag?flagTag(a.flag):''}</h3>
     <div class="sub">${esc(a.where)}</div>
-    ${dl([['Est. price',esc(a.price)],['For 14',esc(a.group)]])}
+    ${dl([['Est. price per person',esc(a.price)]])}
     <p class="sub">${esc(a.note)}</p>
     <div class="plinks">${a.links.map(l=>link(l[0],l[1])).join(' ')} ${link('Google Maps','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a.name+' '+a.where))}</div></section>`).join('');
   return banner('Things to Do','Non-skiing options for the group · Mar 12–16, 2027') + `<div class="page">
