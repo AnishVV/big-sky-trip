@@ -105,38 +105,72 @@ const BOOKINGS = [
   {item:'Dinner reservations', status:'Not booked', detail:'Vegetarian options: Blue Buddha Sushi Lounge, Thai Basil, Niseko Ramen, By Word of Mouth, Blindside Burger (call about stock/fish sauce).', cost:'—'}
 ];
 
+/* ===== FESTIVAL (from Experts Only Details/Experts Only – Big Sky Details.md, researched 2026-11-15; official FAQ + press). Gate/set times are NOT announced. ===== */
 const FESTIVAL = {
+  tagline:'John Summit presents the Experts Only ski weekender: two nights of outdoor dance music in Big Sky, Montana.',
   facts:[
-    ['What','John Summit presents Experts Only Big Sky: a two-night outdoor dance-music show plus skiing.'],
-    ['When','Sat Mar 13 & Sun Mar 14, 2027. Listing shows 5–11 pm; official gate times TBA.'],
-    ['Where','Big Sky Events Arena, 450 Aspen Leaf Drive, Town Center. Outdoor, up to 5,000.'],
-    ['Who','John Summit (first time in Montana). Support acts not announced.'],
-    ['Age','21+ with valid photo ID. Whistler required two IDs; bring a second to be safe.'],
-    ['Re-entry','None. 2-day pass holders scan in each day.']
+    ['Who','John Summit headlines both nights. His first show in Montana. Support acts not announced.'],
+    ['Where','Big Sky Events Arena, 450 Aspen Leaf Dr, Town Center. Outdoor, up to 5,000.'],
+    ['Age','21+ with valid photo ID. Whistler required two IDs, so pack a second one.'],
+    ['Entry','2-day pass: scan in each day. No re-entry once you leave.'],
+    ['Weather','Rain, snow or shine. Delays are possible.']
   ],
-  rules:{
-    wear:'Layers, warm jacket, hat, gloves, traction boots, hand & toe warmers.',
-    allowed:'Empty reusable bottle, stadium seats, blankets, small purses/handheld bags.',
-    banned:'Glass, cans, outside food/drink, coolers, chairs, umbrellas, drones, lasers, pro cameras, weapons, fireworks, pets.',
-    vendors:'Food trucks, nonalcoholic drinks, full bar (ID). Cash and cards. Merch on site.'
-  },
+  shows:[
+    {n:'Show 1', wd:'Saturday', d:'13', mo:'March', time:'Listing shows 5–11 pm. Gates TBA.'},
+    {n:'Show 2', wd:'Sunday',   d:'14', mo:'March', time:'Listing shows 5–11 pm. Gates TBA.'}
+  ],
+  wear:['Layers + warm jacket','Hat and gloves','Traction boots','Hand and toe warmers','Sunglasses and sunscreen if you ski that day'],
+  allowed:['Empty reusable water bottle','Stadium seats for the bleachers','Blankets','Small purse or handheld bag (screened)'],
+  banned:['Glass, cans, outside food or drink','Coolers, chairs, umbrellas','Drones, laser pointers, pro camera gear','Weapons, fireworks, pets (service animals fine)','Large bags'],
+  vendors:'Local vendors and food trucks, nonalcoholic drinks, and a full bar (ID required). Cash and cards both work. Merch on site. No vendor list or menus yet, so vegetarian options are unconfirmed.',
+  packing:[
+    ['id','Photo ID (21+), plus a second ID'],
+    ['ticket','Flicket ticket on your phone, charged phone'],
+    ['warm','Warm layers, hat, gloves, traction boots'],
+    ['hand','Hand and toe warmers'],
+    ['bottle','Empty water bottle'],
+    ['seat','Stadium seat or blanket (optional)'],
+    ['bag','Small bag only, no large bags'],
+    ['ride','Sober driver or ride sorted for the night']
+  ],
+  unknown:[
+    ['Lineup beyond John Summit','Past years: 6–7 weeks out, so Jan–Feb 2027'],
+    ['Gate and set times','Not published'],
+    ['Parking and venue map','"Coming soon". Email events@theoutlawpartners.com'],
+    ['EO Express shuttle','Ticket add-on; price and pickup times TBA'],
+    ['Day parties, afterparties, pop-ups','Promised ("parties all over the mountain"), none named. May need a lift ticket']
+  ],
   past:[
-    ['Vail 2025','Ford Park shows; après at Avanti, afterparties, Sunday mountaintop pop-up.'],
-    ['Whistler 2026','Gates 3 pm, show 4 pm (official); Friday pop-up needed lift ticket; sold out.'],
-    ['Vail 2026','Après at Avanti from noon; main event ended ~9 pm.']
+    ['Vail 2025','Feb 14–16','Ford Park, Fri and Sat evenings. Daytime après, two afterparties, a Sunday mountaintop pop-up.'],
+    ['Whistler 2026','Mar 14–15','Gates 3 pm, show 4 pm. Friday pop-up needed a lift ticket. Sold out.'],
+    ['Vail 2026','Mar 21–22','Après from noon. Main event ended around 9 pm. Warm winter, little snow.']
+  ],
+  pastNote:'Big Sky may differ: its arena is in Town Center, not at the ski base, and only the two arena shows are announced.',
+  tips:[
+    ['Stay in Big Sky','Many Vail attendees drove home the same night. Gallatin Canyon is about an hour of winter driving to BZN with limited rideshare, so skip that plan.'],
+    ['Plan a lighter Sunday morning','Attendees reported barely making it up the gondola the day after.'],
+    ['Dress for the cold side','Big Sky is colder and higher than Vail. You stand outside for hours. March lows are roughly 12–17 °F.'],
+    ['Line up the ride back','Rideshare is "very limited". Pick a sober driver for each night.']
   ],
   alerts:[
-    ['Experts Only / John Summit Instagram','@expertsonly, @johnsummit'],
-    ['Explore Big Sky Town Crier','explorebigsky.com/town-crier-sign-up'],
-    ['Big Sky Resort email/text','bigskyresort.com/preferences/sms'],
-    ['Flicket account emails','Add-ons & upgrades']
+    ['Instagram','@expertsonly and @johnsummit','https://www.instagram.com/expertsonly'],
+    ['Explore Big Sky Town Crier','Newsletter sign-up','https://www.explorebigsky.com/town-crier-sign-up'],
+    ['Big Sky Resort texts','Resort updates','https://www.bigskyresort.com/preferences/sms'],
+    ['Flicket account emails','Add-ons and upgrades','https://outlaw.flicket.io/']
+  ],
+  links:[
+    ['Official site','https://expertsonlybigsky.com/'],
+    ['Know Before You Go','https://expertsonlybigsky.com/know-before-you-go/'],
+    ['Event packages','https://travel.expertsonlyrecs.com/big-sky-packages'],
+    ['Venue listing','https://bigskytowncenter.com/venue/big-sky-events-arena/']
   ],
   playlists:[
     ['John Summit x Experts Only Mix','https://open.spotify.com/playlist/0xWPhgsVxXFlnMnyORfz7T'],
     ['Experts Only Radio 054 (fan)','https://open.spotify.com/playlist/7qg9VLvjFEpsrcJ2toZESL'],
     ['John Summit ⛰️ Experts Only (fan)','https://open.spotify.com/playlist/7xYk2BS9dUFF5wBuzMSQUF']
   ],
-  songs:'Where You Are (feat. Hayla), Shiver, Go Back, Deep End. Style: tech house / melodic house.'
+  songs:['Where You Are (feat. Hayla)','Shiver','Go Back','Deep End'],
+  style:'Tech house / melodic house'
 };
 
 /* Travel & Logistics. Source notes: vault "Big Sky Logistics" folder (seen 2026-11-16). Anything flagged is an estimate or a single weak source. */

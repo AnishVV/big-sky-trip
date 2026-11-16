@@ -387,17 +387,88 @@ function bindTasks(){
 }
 
 /* ===== FESTIVAL ===== */
+const FX_BARS = [38,62,46,80,54,92,66,48,84,58,100,70,44,88,60,76,50,94,64,42,82,56,72,40];
 function viewFestival(){
-  const F = FESTIVAL;
-  return banner('Experts Only','John Summit · Big Sky Events Arena · Mar 13–14, 2027') + `<div class="page">
-    <div class="grid2">
-      ${card('The basics', dl(F.facts))}
-      ${card('At the venue', dl([['Wear',F.rules.wear],['Allowed',F.rules.allowed],['Banned',F.rules.banned],['Food & drink',F.rules.vendors]]) + `<p class="sub">Rain, snow or shine. Source: official Know Before You Go. ${link('Official site','https://expertsonlybigsky.com/know-before-you-go/')}</p>`)}
-      ${card('What past weekends looked like', dl(F.past) + '<p class="sub">Big Sky may differ: its arena is in Town Center, not at the ski base, and only the two arena shows are announced.</p>')}
-      ${card('Get alerts', dl(F.alerts))}
-      ${card('Music prep', `<ul>${F.playlists.map(p=>`<li>${link(p[0],p[1])}</li>`).join('')}</ul><p class="sub">${esc(F.songs)}</p>`)}
-      ${card('Still unknown', `<ul class="oq"><li>Lineup beyond John Summit</li><li>Gate and set times</li><li>Parking and venue map</li><li>EO Express price and pickup times</li><li>Day parties / afterparties / pop-ups (may need a lift ticket)</li></ul>`)}
-    </div></div>`;
+  const F = FESTIVAL, d = daysTo();
+  const packed = new Set(store.get('fxpack', []));
+  const stub = `<div class="fx-stub" aria-label="Your ticket">
+      <div class="fx-stub-top"><span class="eyebrow">2-DAY PASS</span><span class="tag ok">Bought</span></div>
+      <div class="fx-stub-days"><b>${d}</b><small>DAYS TO GO</small></div>
+      <div class="fx-stub-meta">Sat Mar 13 · Sun Mar 14<br>$420 · Flicket · final sale</div>
+    </div>`;
+  const shows = F.shows.map(s => `<article class="card fx-show">
+      <div class="fx-show-date"><span>${s.wd.slice(0,3).toUpperCase()}</span><b>${s.d}</b><span>${s.mo.toUpperCase()}</span></div>
+      <div class="fx-show-body">
+        <div class="eyebrow">${s.n.toUpperCase()} · BIG SKY EVENTS ARENA</div>
+        <h3>John Summit</h3>
+        <div class="fx-show-sub">Support acts: not announced</div>
+        <div class="fx-show-time">${esc(s.time)} ${flagTag('Times provisional')}</div>
+      </div></article>`).join('');
+  const col = (title, cls, items) => `<div class="fx-col ${cls}"><h4>${title}</h4><ul>${items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`;
+  const pack = F.packing.map(([id,t]) => `<li><label class="fx-chk"><input type="checkbox" data-pack="${id}" ${packed.has(id)?'checked':''}><span class="fx-box"></span><span class="fx-chk-t">${esc(t)}</span></label></li>`).join('');
+  const unknown = F.unknown.map(([t,w]) => `<li><span class="fx-dot"></span><div><strong>${esc(t)}</strong><span>${esc(w)}</span></div></li>`).join('');
+  const past = F.past.map(([n,dt,t]) => `<li><div class="fx-past-h"><strong>${esc(n)}</strong><em>${esc(dt)}</em></div><p>${esc(t)}</p></li>`).join('');
+  const tips = F.tips.map(([t,b]) => `<li><strong>${esc(t)}</strong><p>${esc(b)}</p></li>`).join('');
+  return `<header class="fx-hero">
+      <img src="img/hero.jpg" alt=""><div class="fx-shade"></div>
+      <div class="fx-eq" aria-hidden="true">${FX_BARS.map((h,i)=>`<i style="--h:${h}%;--d:${(i*0.11).toFixed(2)}s"></i>`).join('')}</div>
+      <div class="fx-copy">
+        <div class="fx-kicker">JOHN SUMMIT PRESENTS</div>
+        <h1>EXPERTS<br><span>ONLY</span></h1>
+        <div class="fx-where">BIG SKY · MONTANA</div>
+        <div class="fx-chips"><span>MAR 13–14, 2027</span><span>OUTDOOR</span><span>21+</span><span>SKI WEEKENDER</span></div>
+      </div>${stub}
+    </header>
+    <div class="page fx-page">
+      <p class="fx-lede">${esc(F.tagline)}</p>
+      <section class="fx-shows">${shows}</section>
+
+      <section class="card panel">
+        <h3>Know before you go</h3>
+        <div class="fx-cols">
+          ${col('Wear','wear',F.wear)}${col('Bring','ok',F.allowed)}${col('Leave at home','no',F.banned)}
+        </div>
+        <p class="sub fx-foot">${esc(F.vendors)} Rain, snow or shine. Source: ${link('official Know Before You Go','https://expertsonlybigsky.com/know-before-you-go/')}</p>
+      </section>
+
+      <div class="grid2">
+        ${card('Show-night checklist', `<ul class="fx-pack">${pack}</ul><div class="fx-progress"><div class="bar"><i id="fxBar" style="width:0"></i></div><span id="fxCount"></span></div>`)}
+        ${card('The basics', dl(F.facts))}
+      </div>
+
+      <section class="card panel fx-unk">
+        <h3>Still to be announced</h3>
+        <ul class="fx-tl">${unknown}</ul>
+        <p class="sub">Turn on alerts below so you see the lineup and gate times first.</p>
+      </section>
+
+      <div class="grid2">
+        ${card('Make a night of it', `<ul class="fx-tips">${tips}</ul>`)}
+        ${card('What past weekends looked like', `<ul class="fx-past">${past}</ul><p class="sub">${esc(F.pastNote)} Full notes are in the vault under Experts Only Details.</p>`)}
+      </div>
+
+      <div class="grid2">
+        ${card('Get alerts', `<ul class="fx-alerts">${F.alerts.map(a=>`<li><a class="ext" href="${a[2]}" target="_blank" rel="noopener"><span><strong>${esc(a[0])}</strong><small>${esc(a[1])}</small></span>${ico('ext')}</a></li>`).join('')}</ul>`)}
+        ${card('Music prep', `<ul class="fx-lists">${F.playlists.map(p=>`<li>${link(p[0],p[1])}</li>`).join('')}</ul>
+          <div class="fx-songs"><span class="eyebrow">START WITH</span><div>${F.songs.map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div><p class="sub">${esc(F.style)}</p></div>`)}
+      </div>
+
+      <section class="card panel fx-go">
+        <div><h3>Getting there and back</h3><p>Arena, parking, rides and the drive from Bozeman live on the logistics page.</p></div>
+        <div class="fx-go-links"><a class="btn outline" href="#/travel">Travel &amp; Logistics ${ico('arrow')}</a><a class="btn outline" href="#/explore/fest">Arena on the map ${ico('arrow')}</a></div>
+        <div class="plinks">${F.links.map(l=>link(l[0],l[1])).join(' ')}</div>
+      </section>
+    </div>`;
+}
+function bindFestival(){
+  const boxes = [...document.querySelectorAll('[data-pack]')];
+  const sync = () => {
+    const n = boxes.filter(b=>b.checked).length;
+    $('#fxBar').style.width = (n/boxes.length*100)+'%';
+    $('#fxCount').textContent = n===boxes.length ? 'All packed' : `${n} of ${boxes.length} ready`;
+  };
+  boxes.forEach(b => b.onchange = () => { store.set('fxpack', boxes.filter(x=>x.checked).map(x=>x.dataset.pack)); sync(); });
+  sync();
 }
 
 /* ===== THINGS TO DO ===== */
@@ -419,18 +490,18 @@ function viewActivities(cat='all'){
 }
 
 /* ===== router ===== */
-const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary,bindItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel,bindTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
+const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary,bindItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel,bindTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival,bindFestival]};
 let lastHash = null;
-const PAGE_TITLE = {home:'Experts Only', festival:'Experts Only'};
+const PAGE_TITLE = {home:'Experts Only', festival:'Festival'};
 function render(){
   const [, route='home', arg] = location.hash.split('/');
   const [fn, bind] = ROUTES[route] || ROUTES.home;
   $('#view').innerHTML = fn(arg);
   if (bind) bind();
   $('.main').classList.toggle('is-home', route==='home' || !ROUTES[route]);
-  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.route === (route==='festival'?'home':route)));
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.route === route));
   $('#bellDot').textContent = pending();
-  const tab = ROUTES[route] ? (route==='festival' ? 'home' : route) : 'home';
+  const tab = ROUTES[route] ? route : 'home';
   document.querySelectorAll('#tabbar a').forEach(a => a.classList.toggle('active', a.dataset.tab === tab));
   menuBtn.classList.toggle('active', !document.querySelector(`#tabbar a[data-tab="${tab}"]`));
   const navLink = document.querySelector(`#nav a[data-route="${route}"]`);
