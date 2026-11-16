@@ -157,7 +157,7 @@ function viewExplore(cat='all'){
   const items = list.map((e,i) => `<div class="place" data-i="${EXPLORE.indexOf(e)}" ${e.ll?'':'data-nopin="1"'}>
       <div class="cat"><i class="cdot" style="background:${CAT_COLOR[e.cat]}"></i>${CATS[e.cat]}${e.ll?'':' · not pinned'}</div>
       <h3>${esc(e.name)} ${e.flag?flagTag(e.flagText||'Speculative'):''}${e.approx?flagTag('Approx. pin'):''}</h3>
-      <div class="sub">${esc(e.sub)}</div><p>${esc(e.note)}</p>
+      <div class="sub">${esc(e.sub)}</div>${e.r?`<div class="rating">★ ${esc(e.r)}</div>`:(['food','night','act'].includes(e.cat)?'<div class="rating none">No rating found</div>':'')}<p>${esc(e.note)}</p>
       <div class="plinks">${link('Open in Google Maps', gmapsSearch(e))} ${e.ll?link('Directions', gmapsDir(e)):''}</div></div>`).join('');
   return banner('Explore Big Sky','Resort, festival, food and lodging in one place') + `<div class="page">
     <div class="chips">${chips}</div>
@@ -183,7 +183,7 @@ function bindExplore(){
   pins.forEach(e => {
     const icon = L.divIcon({className:'', html:`<span class="mk" style="background:${CAT_COLOR[e.cat]}"></span>`, iconSize:[22,22], iconAnchor:[11,11], popupAnchor:[0,-12]});
     const m = L.marker(e.ll, {icon, title:e.name}).addTo(map).bindPopup(
-      `<b>${esc(e.name)}</b><br><span class="pc">${CATS[e.cat]}</span><br>${esc(e.sub)}<br><a href="${gmapsDir(e)}" target="_blank" rel="noopener">Directions in Google Maps</a>`);
+      `<b>${esc(e.name)}</b><br><span class="pc">${CATS[e.cat]}</span><br>${esc(e.sub)}${e.r?`<br>★ ${esc(e.r)}`:''}<br><a href="${gmapsDir(e)}" target="_blank" rel="noopener">Directions in Google Maps</a>`);
     markers[EXPLORE.indexOf(e)] = m;
   });
   // fit to the Big Sky area; the airport is ~40 miles away so it only counts when it's the sole result
