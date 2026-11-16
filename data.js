@@ -82,7 +82,7 @@ const BOOKINGS = [
   {item:'Flights', status:'Not booked', detail:'Into Bozeman (BZN) Fri Mar 12, out Tue Mar 16. Cash ~$500 or ~40k points (≈1.25¢/pt break-even).', cost:'~$500 pp'},
   {item:'Rental cars', status:'Not booked', detail:'~3 cars for 14 (about 5 each). Estimate $452.84/car + ~$80 gas & parking. AWD / winter tires.', cost:'$114 pp'},
   {item:'Lift tickets', status:'Not booked', detail:'Ikon Session 2-day from $369 (tram not included) vs ~$200/day weekend window. No official Mar 13–14 price found.', cost:'$300–400 pp', flag:'Check shop.bigskyresort.com'},
-  {item:'Gear rental', status:'Not booked', detail:'Book online 24h+ ahead (Christy 20% off). House is not near the shops; Big Sky Sports delivery is $49/skier.', cost:'~$100 pp'},
+  {item:'Gear rental', status:'Not booked', detail:'Slope side or Mountain Village preferred (Big Sky Sports). Book online 24h+ ahead (20–25% off walk-in). House is not near the shops; Big Sky Sports delivery is $49/skier.', cost:'~$100 pp'},
   {item:'EO Express shuttle', status:'Unknown', detail:'Bozeman → arena, both days. Ticket add-on only as far as found.', cost:'Price unknown', flag:'Unverified'},
   {item:'Dinner reservations', status:'Not booked', detail:'Vegetarian options: Blue Buddha Sushi Lounge, Thai Basil, Niseko Ramen, By Word of Mouth, Blindside Burger (call about stock/fish sauce).', cost:'—'}
 ];

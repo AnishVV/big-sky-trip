@@ -259,7 +259,7 @@ function viewBudget(){
     ${card('Scenarios', table(['',...BUDGET.scenarios.cols], BUDGET.scenarios.rows))}
     <div class="grid2">
       ${card('Shared vs individual', `<div class="cols"><div><b>Shared (split)</b><ul>${BUDGET.split.shared.map(x=>`<li>${x}</li>`).join('')}</ul></div><div><b>Individual</b><ul>${BUDGET.split.individual.map(x=>`<li>${x}</li>`).join('')}</ul></div></div><p class="sub">Use Splitwise or a sheet; one person fronts the house; collect deposits at booking. Skippers don't pay for passes or rentals.</p>`)}
-      ${card('Rental shops', table(['Shop','Where','Per day'], BUDGET.rentals))}
+      ${card('Rental shops', table(['Shop','Where','Per day'], BUDGET.rentals) + '<p class="sub"><b>Preferred: slope side or Mountain Village.</b> Big Sky Sports (Mountain Village and Madison Base) is the slope-side option. Christy Sports – Mountain Village is the closest off-slope alternative.</p>')}
     </div>
   </div>`;
 }
