@@ -63,7 +63,7 @@ function viewHome(){
     <div class="hero-copy">
       <div class="hero-kicker"><span>—</span> BIG SKY <span>—</span></div>
       <h1>EXPERTS ONLY</h1>
-      <div class="hero-tag">SKI BY DAY. DANCE BY NIGHT.</div>
+      <div class="hero-tag">EAT SKI RAVE REPEAT</div>
       <div class="hero-date"><i></i>MARCH 13–14, 2027<b>•</b>BIG SKY, MONTANA<i></i></div>
     </div>
   </section>
@@ -156,7 +156,7 @@ function viewExplore(cat='all'){
   const chips = [['all','All'],...Object.entries(CATS)].map(([k,v])=>`<a class="chip ${k===cat?'on':''}" href="#/explore/${k}">${k!=='all'?`<i class="cdot" style="background:${CAT_COLOR[k]}"></i>`:''}${v}</a>`).join('');
   const items = list.map((e,i) => `<div class="place" data-i="${EXPLORE.indexOf(e)}" ${e.ll?'':'data-nopin="1"'}>
       <div class="cat"><i class="cdot" style="background:${CAT_COLOR[e.cat]}"></i>${CATS[e.cat]}${e.ll?'':' · not pinned'}</div>
-      <h3>${esc(e.name)} ${e.flag?flagTag('Speculative'):''}${e.approx?flagTag('Approx. pin'):''}</h3>
+      <h3>${esc(e.name)} ${e.flag?flagTag(e.flagText||'Speculative'):''}${e.approx?flagTag('Approx. pin'):''}</h3>
       <div class="sub">${esc(e.sub)}</div><p>${esc(e.note)}</p>
       <div class="plinks">${link('Open in Google Maps', gmapsSearch(e))} ${e.ll?link('Directions', gmapsDir(e)):''}</div></div>`).join('');
   return banner('Explore Big Sky','Resort, festival, food and lodging in one place') + `<div class="page">
@@ -187,7 +187,7 @@ function bindExplore(){
     markers[EXPLORE.indexOf(e)] = m;
   });
   // fit to the Big Sky area; the airport is ~40 miles away so it only counts when it's the sole result
-  const fitPts = pins.filter(e => e.cat!=='go' || pins.length===1).map(e => e.ll);
+  const fitPts = pins.filter(e => (e.cat!=='go' && !e.far) || pins.length===1).map(e => e.ll);
   if (fitPts.length > 1) map.fitBounds(fitPts, {padding:[40,40]}); else map.setView(fitPts[0] || [45.27,-111.35], 13);
   document.querySelectorAll('.place').forEach(el => el.addEventListener('click', ev => {
     if (ev.target.closest('a')) return;
