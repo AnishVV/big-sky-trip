@@ -155,7 +155,7 @@ function viewExplore(cat='all'){
   const chips = [['all','All'],...Object.entries(CATS)].map(([k,v])=>`<a class="chip ${k===cat?'on':''}" href="#/explore/${k}">${k!=='all'?`<i class="cdot" style="background:${CAT_COLOR[k]}"></i>`:''}${v}</a>`).join('');
   const items = list.map((e,i) => `<div class="place" data-i="${EXPLORE.indexOf(e)}" ${e.ll?'':'data-nopin="1"'}>
       <div class="cat"><i class="cdot" style="background:${CAT_COLOR[e.cat]}"></i>${CATS[e.cat]}${e.ll?'':' · not pinned'}</div>
-      <h3>${esc(e.name)} ${e.flag?flagTag(e.flagText||'Speculative'):''}${e.approx?flagTag('Approx. pin'):''}</h3>
+      <h3>${esc(e.name)} ${e.flag?flagTag(e.flagText||'Speculative'):''}${e.area?flagTag('Area only'):e.approx?flagTag('Approx. pin'):''}</h3>
       <div class="sub">${esc(e.sub)}</div>${e.r?`<div class="rating">★ ${esc(e.r)}</div>`:(['food','night','act'].includes(e.cat)?'<div class="rating none">No rating found</div>':'')}<p>${esc(e.note)}</p>
       <div class="plinks">${link('Open in Google Maps', gmapsSearch(e))} ${e.ll?link('Directions', gmapsDir(e)):''}</div></div>`).join('');
   return banner('Explore Big Sky','Resort, festival, food and lodging in one place') + `<div class="page">
@@ -182,12 +182,20 @@ function bindExplore(){
   pins.forEach(e => {
     const icon = L.divIcon({className:'', html:`<span class="mk" style="background:${CAT_COLOR[e.cat]}"></span>`, iconSize:[22,22], iconAnchor:[11,11], popupAnchor:[0,-12]});
     const m = L.marker(e.ll, {icon, title:e.name}).addTo(map).bindPopup(
-      `<b>${esc(e.name)}</b><br><span class="pc">${CATS[e.cat]}</span><br>${esc(e.sub)}${e.r?`<br>★ ${esc(e.r)}`:''}<br><a href="${gmapsDir(e)}" target="_blank" rel="noopener">Directions in Google Maps</a>`);
+      `<b>${esc(e.name)}</b><br><span class="pc">${CATS[e.cat]}</span><br>${esc(e.sub)}${e.area?'<br><i>Exact spot unknown: dot marks the area only</i>':''}${e.r?`<br>★ ${esc(e.r)}`:''}<br><a href="${gmapsDir(e)}" target="_blank" rel="noopener">Directions in Google Maps</a>`);
     markers[EXPLORE.indexOf(e)] = m;
   });
   // fit to the Big Sky area; the airport is ~40 miles away so it only counts when it's the sole result
   const fitPts = pins.filter(e => (e.cat!=='go' && !e.far) || pins.length===1).map(e => e.ll);
-  if (fitPts.length > 1) map.fitBounds(fitPts, {padding:[40,40]}); else map.setView(fitPts[0] || [45.27,-111.35], 13);
+  const allPts = pins.map(e => e.ll);
+  if (fitPts.length > 1) map.fitBounds(fitPts, {padding:[40,40]});
+  else if (fitPts.length === 1) map.setView(fitPts[0], 13);
+  else if (allPts.length > 1) map.fitBounds(allPts, {padding:[40,40]});
+  else map.setView(allPts[0] || [45.27,-111.35], 13);
+  if (pins.some(e => e.far)) {
+    const Ctl = L.Control.extend({onAdd(){ const b = L.DomUtil.create('button','fitall'); b.type='button'; b.textContent='Show Bozeman side'; L.DomEvent.disableClickPropagation(b); b.onclick = () => map.fitBounds(allPts, {padding:[40,40]}); return b; }});
+    new Ctl({position:'bottomleft'}).addTo(map);
+  }
   document.querySelectorAll('.place').forEach(el => el.addEventListener('click', ev => {
     if (ev.target.closest('a')) return;
     const m = markers[el.dataset.i]; if (!m) return;

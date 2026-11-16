@@ -244,3 +244,4 @@ a.pill:hover,.chip:hover{background:#26262a}
 .rating{font-size:12.5px;color:#e9b44c;margin-top:4px}
 .rating.none{color:#7d7872}
 .act dl.facts{margin-top:8px}
+.fitall{background:#18181a;color:#ece7e1;border:1px solid #bdb8b1;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer}
