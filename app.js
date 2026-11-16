@@ -62,7 +62,6 @@ function viewHome(){
     <img class="hero-img" src="img/hero.jpg" alt=""><div class="hero-shade"></div>
     <div class="hero-copy">
       <div class="hero-kicker"><span>—</span> BIG SKY <span>—</span></div>
-      <h1>EXPERTS ONLY</h1>
       <div class="hero-tag">EAT SKI RAVE REPEAT</div>
       <div class="hero-date"><i></i>MARCH 13–14, 2027<b>•</b>BIG SKY, MONTANA<i></i></div>
     </div>
@@ -288,8 +287,26 @@ function viewFestival(){
     </div></div>`;
 }
 
+/* ===== THINGS TO DO ===== */
+function viewActivities(cat='all'){
+  if (cat!=='all' && !ACT_CATS[cat]) cat='all';
+  const chips = [['all','All'],...Object.entries(ACT_CATS)].map(([k,v])=>`<a class="chip ${k===cat?'on':''}" href="#/activities/${k}">${v}</a>`).join('');
+  const list = ACTIVITIES.filter(a => cat==='all' || a.cat===cat);
+  const cards = list.map(a => `<section class="card panel act">
+    <h3>${esc(a.name)} ${a.flag?flagTag(a.flag):''}</h3>
+    <div class="sub">${esc(a.where)}</div>
+    ${dl([['Est. price',esc(a.price)],['For 14',esc(a.group)]])}
+    <p class="sub">${esc(a.note)}</p>
+    <div class="plinks">${a.links.map(l=>link(l[0],l[1])).join(' ')} ${link('Google Maps','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a.name+' '+a.where))}</div></section>`).join('');
+  return banner('Things to Do','Non-skiing options for the group · Mar 12–16, 2027') + `<div class="page">
+    <div class="note warn">Prices are undated estimates from listings and resellers, <b>not confirmed for March 2027</b>. Many are per sleigh, sled or boat, so 14 people means several. Call or check the link before booking. Full notes live in the vault under Non Skiing.</div>
+    <div class="chips" style="flex-wrap:wrap">${chips}</div>
+    <div class="grid2">${cards}</div>
+  </div>`;
+}
+
 /* ===== router ===== */
-const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary], explore:[viewExplore,bindExplore], travel:[viewTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
+const ROUTES = {home:[viewHome,bindHome], itinerary:[viewItinerary], explore:[viewExplore,bindExplore], activities:[viewActivities], travel:[viewTravel], bookings:[viewBookings], budget:[viewBudget,bindBudget], tasks:[viewTasks,bindTasks], festival:[viewFestival]};
 function render(){
   const [, route='home', arg] = location.hash.split('/');
   const [fn, bind] = ROUTES[route] || ROUTES.home;
