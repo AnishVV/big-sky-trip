@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Experts Only – Big Sky | Trip Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></g><g fill="currentColor"><circle cx="8" cy="13.5" r="1"/><circle cx="12" cy="13.5" r="1"/><circle cx="16" cy="13.5" r="1"/><circle cx="8" cy="17" r="1"/><circle cx="12" cy="17" r="1"/><circle cx="16" cy="17" r="1"/></g></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></symbol>
+    <symbol id="i-plane" viewBox="0 0 24 24"><path fill="currentColor" d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path fill="currentColor" d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4zm6 1v8h2V8zm4 0v8h2V8z"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6a2 2 0 0 1 2-2h11v3H6v.5h14A1 1 0 0 1 21 8.5V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm13 6.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm4.2 12.3L6.4 12.5 5 13.9l4.2 4.2L19 8.3 17.600 6.900z"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18V6l11-2v12.2a3 3 0 1 1-2-2.8V7.3L11 8.500V18a3 3 0 1 1-2-2.800z"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2v7a2 2 0 0 0 1 1.700V22h2V10.700A2 2 0 0 0 11 9V2h-1.500v5H8.500V2H7zm9 0c-2 1.500-3 4-3 7 0 1.500.8 2.500 2 3V22h2V2z"/></symbol>
+    <symbol id="i-bed" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h2v8h14v-3a3 3 0 0 0-3-3h-5v6H7V8H5V6zm0 10h18v4h-2v-2H5v2H3zM7.500 8.500a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></symbol>
+    <symbol id="i-mtn" viewBox="0 0 24 24"><path fill="currentColor" d="M2 20 9 7l3.500 6L15 9l7 11z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.500" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.900 4.900 7 7M17 17l2.100 2.100M4.900 19.100 7 17M17 7l2.100-2.100"/></g></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4zM10 21h4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-logo" viewBox="0 0 120 100">
+      <g fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="miter">
+        <path d="M38 6 70 50 38 94 6 50z"/>
+        <path d="M82 6 114 50 82 94 50 50z"/>
+      </g>
+      <path fill="none" stroke="currentColor" stroke-width="3.500" stroke-linecap="round" d="M30 56c8-12 16-14 22-6 4 5 8 5 12-1 6-8 14-8 20-2"/>
+    </symbol>
+      <symbol id="i-cart" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h3l.6 3H21l-2 9H8L6 5H3zM9 18a1.700 1.700 0 1 0 0 3.400A1.700 1.700 0 0 0 9 18zm8 0a1.700 1.700 0 1 0 0 3.400A1.700 1.700 0 0 0 17 18z"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path fill="currentColor" d="M5 11l1.500-4.500A2 2 0 0 1 8.400 5h7.200a2 2 0 0 1 1.900 1.500L19 11a2 2 0 0 1 2 2v4h-2v2h-3v-2H8v2H5v-2H3v-4a2 2 0 0 1 2-2zm2.200 0h9.600l-1-3H8.200zM6.500 13.500a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400zm11 0a1.200 1.200 0 1 0 0 2.400 1.200 1.200 0 0 0 0-2.400z"/></symbol>
+    <symbol id="i-ski" viewBox="0 0 24 24"><path fill="currentColor" d="M3 20 21 15v2L3 22zM14 3a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM9 9l5-1 3 3 3 .6-.4 1.900-3.900-.8-2-2-1 2 2.500 2.500-.7 4-2-.4.5-3.200L8.500 13z"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.800" stroke-linecap="round" fill="none"><path d="M12 2v20M3.300 7l17.400 10M3.300 17 20.700 7"/><path d="m9 3.500 3 2.500 3-2.500M9 20.500 12 18l3 2.500"/></g></symbol>
+    <symbol id="i-ext" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/></symbol>
+  </defs>
+</svg>
+
+<div class="stage" id="stage">
+  <aside class="sidebar">
+    <a class="brand" href="#/home">
+      <svg class="brand-logo"><use href="#i-logo"/></svg>
+      <div class="brand-name">EXPERTS<br>ONLY</div>
+      <div class="brand-sub">BIG SKY</div>
+    </a>
+    <nav class="nav" id="nav">
+      <a data-route="home" href="#/home"><svg><use href="#i-home"/></svg>Home</a>
+      <a data-route="itinerary" href="#/itinerary"><svg><use href="#i-cal"/></svg>Itinerary</a>
+      <a data-route="explore" href="#/explore"><svg><use href="#i-pin"/></svg>Explore</a>
+      <a data-route="travel" href="#/travel"><svg><use href="#i-plane"/></svg>Travel &amp; Logistics</a>
+      <a data-route="bookings" href="#/bookings"><svg><use href="#i-ticket"/></svg>Bookings</a>
+      <a data-route="budget" href="#/budget"><svg><use href="#i-wallet"/></svg>Budget</a>
+      <a data-route="tasks" href="#/tasks"><svg><use href="#i-check"/></svg>Tasks &amp; Crew</a>
+    </nav>
+    <div class="side-divider"></div>
+    <div class="side-foot">
+      <img src="img/sidebar-mountain.jpg" alt="">
+      <div class="side-foot-text">BIG SKY, MONTANA<br>MARCH 13–14, 2027</div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="hero-top">
+      <div class="avatars" id="avatars"></div>
+      <button class="bell" aria-label="Notifications" id="bell"><svg><use href="#i-bell"/></svg><i id="bellDot"></i></button>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
